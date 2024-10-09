@@ -26,9 +26,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { loginSuccess } from '../redux/actions/authActions';
 import { useThemes } from '../context/ThemeContext';
 import { lightColors, darkColors } from '../constants/Color';
+import { useNavigation } from '@react-navigation/native';
 const { flex, alignJustifyCenter, alignItemsCenter, borderWidth1, borderRadius5, resizeModeContain, flexDirectionRow, positionAbsolute, textAlign, textDecorationUnderline } = BaseStyle;
 
-const RegisterScreen = ({ navigation }: { navigation: any }) => {
+const RegisterScreen = ({ onBackToLogin }) => {
+  const navigation = useNavigation();
   const { isDarkMode } = useThemes();
   const colors = isDarkMode ? darkColors : lightColors;
   const [firstName, setFirstName] = useState('');
@@ -65,10 +67,10 @@ const RegisterScreen = ({ navigation }: { navigation: any }) => {
     setPasswordError('');
     setConfirmPasswordError('');
 
-    if (!firstName || !lastName || !phone || !email || !password || !confirmPassword) {
-      setError(PLEASE_FILL_ALL_FIELD);
-      return;
-    }
+    // if (!firstName || !lastName || !phone || !email || !password || !confirmPassword) {
+    //   setError(PLEASE_FILL_ALL_FIELD);
+    //   return;
+    // }
     if (!emailPattern.test(email)) {
       setEmailError(INVALID_EMAIL_FORMAT);
       return;
@@ -293,57 +295,201 @@ const RegisterScreen = ({ navigation }: { navigation: any }) => {
   };
 
   return (
-    <ImageBackground style={[flex, { backgroundColor: colors.whiteColor }]} source={isDarkMode ? '' : BACKGROUND_IMAGE}>
-      <KeyboardAvoidingView
-        style={[styles.container]}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
+    <KeyboardAvoidingView
+      style={[styles.container]}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
 
-        {showOTP ?
-          <>
-            <View style={[styles.logoBox, alignJustifyCenter, { height: hp(25), }]}>
-              <Image source={OTP_VERIFICATION_IMAGE} style={[styles.image, resizeModeContain]} />
-            </View>
-            <View style={[{ marginTop: spacings.large }]}>
-              <Text style={[styles.text, { color: colors.blackColor }]}>OTP Verification</Text>
-            </View>
-            <Text style={{ color: colors.blackColor, marginHorizontal: spacings.small }}>
-              {`Enter the OTP sent to +91 ${phone}`}
-            </Text>
-            <View style={[{ width: "100%", height: hp(18) }, alignJustifyCenter]}>
-              <OTPTextInput
-                handleTextChange={handleOTPChange}
-                inputCount={6}
-                tintColor={colors.blackColor}
-                offTintColor={colors.blackColor}
-                containerStyle={styles.otpContainer}
-                textInputStyle={[styles.otpInput, { color: colors.blackColor }]}
-              />
-              <TouchableOpacity onPress={hadleResendOtp} disabled={resendButtonDisabled}>
-                <Text style={{ color: colors.blackColor, marginHorizontal: spacings.small }}>
-                  OTP not Received?
-                  <Text style={{ color: resendButtonDisabled ? colors.grayColor : colors.blackColor, fontWeight: style.fontWeightThin1x.fontWeight, textDecorationLine: "underline" }}>
-                    {resendButtonDisabled ? ` Resend code in ${timer}s` : ' Resend code'}
-                  </Text>
+      {showOTP ?
+        <>
+          <View style={[styles.logoBox, alignJustifyCenter, { height: hp(25), }]}>
+            <Image source={OTP_VERIFICATION_IMAGE} style={[styles.image, resizeModeContain]} />
+          </View>
+          <View style={[{ marginTop: spacings.large }]}>
+            <Text style={[styles.text, { color: colors.blackColor }]}>OTP Verification</Text>
+          </View>
+          <Text style={{ color: colors.blackColor, marginHorizontal: spacings.small }}>
+            {`Enter the OTP sent to +91 ${phone}`}
+          </Text>
+          <View style={[{ width: "100%", height: hp(18) }, alignJustifyCenter]}>
+            <OTPTextInput
+              handleTextChange={handleOTPChange}
+              inputCount={6}
+              tintColor={colors.blackColor}
+              offTintColor={colors.blackColor}
+              containerStyle={styles.otpContainer}
+              textInputStyle={[styles.otpInput, { color: colors.blackColor }]}
+            />
+            <TouchableOpacity onPress={hadleResendOtp} disabled={resendButtonDisabled}>
+              <Text style={{ color: colors.blackColor, marginHorizontal: spacings.small }}>
+                OTP not Received?
+                <Text style={{ color: resendButtonDisabled ? colors.grayColor : colors.blackColor, fontWeight: style.fontWeightThin1x.fontWeight, textDecorationLine: "underline" }}>
+                  {resendButtonDisabled ? ` Resend code in ${timer}s` : ' Resend code'}
                 </Text>
-              </TouchableOpacity>
-            </View>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                alignItemsCenter,
-                borderRadius5,
-                { backgroundColor: isOtpComplete ? colors.redColor : colors.mediumGray }
-              ]}
-              onPress={isOtpComplete ? VerifyOTP : null}
-              disabled={!isOtpComplete}
-            >
-              <Text style={[styles.buttonText, { color: colors.blackColor }]}>{"Verify & Continue"}</Text>
+              </Text>
             </TouchableOpacity>
-            <View style={[alignJustifyCenter, { height: hp(13), marginTop: spacings.xxxxLarge }]}>
-              <View style={[flexDirectionRow, alignJustifyCenter, { width: "100%", marginTop: spacings.large }]}>
+          </View>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              alignItemsCenter,
+              borderRadius5,
+              { backgroundColor: isOtpComplete ? colors.redColor : colors.mediumGray }
+            ]}
+            onPress={isOtpComplete ? VerifyOTP : null}
+            disabled={!isOtpComplete}
+          >
+            <Text style={[styles.buttonText, { color: colors.blackColor }]}>{"Verify & Continue"}</Text>
+          </TouchableOpacity>
+          <View style={[alignJustifyCenter, { height: hp(13), marginTop: spacings.xxxxLarge }]}>
+            <View style={[flexDirectionRow, alignJustifyCenter, { width: "100%", marginTop: spacings.large }]}>
+              <View style={{ height: 1, backgroundColor: colors.grayColor, width: "46%" }}></View>
+              <Text style={[{ color: colors.blackColor, marginVertical: spacings.xxxxLarge, marginHorizontal: spacings.small }, textAlign]}>{"Or"}</Text>
+              <View style={{ height: 1, backgroundColor: colors.grayColor, width: "46%" }}></View>
+            </View>
+            <View style={[styles.socialAuthBox, alignJustifyCenter, flexDirectionRow]}>
+              <TouchableOpacity style={[styles.socialButton, alignJustifyCenter]} onPress={googleSignUp}>
+                <Image source={GOOGLE_LOGO_IMAGE} style={[{ width: wp(6), height: hp(4) }, resizeModeContain]} />
+              </TouchableOpacity>
+              {Platform.OS === 'ios' && <TouchableOpacity style={[styles.socialButton, alignJustifyCenter]} >
+                <Image source={APPLE_LOGO_IMAGE} style={[{ width: wp(6), height: hp(4) }, resizeModeContain]} />
+              </TouchableOpacity>}
+            </View>
+          </View>
+        </>
+        :
+        <>
+          {/* <TouchableOpacity style={[positionAbsolute, styles.backIcon]} onPress={() => { logEvent(`Back Button Pressed from Register`), navigation.goBack() }}>
+              <Ionicons name={"arrow-back"} size={33} color={colors.blackColor} />
+            </TouchableOpacity> */}
+          <View style={[styles.logoBox, alignJustifyCenter]}>
+            <Text style={[styles.text, { color: colors.blackColor }]}>Sign Up</Text>
+          </View>
+          <View style={[styles.textInputBox]}>
+            <View style={[flexDirectionRow]}>
+              <View style={{ width: "48%", marginRight: spacings.large, }}>
+                <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{FIRST_NAME}</Text>
+                <View style={[styles.halfInput, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: colors.grayColor }]}>
+                  <View>
+                    <Ionicons name={"person-sharp"} size={20} color={blackColor} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <TextInput
+                      placeholder={FIRST_NAME}
+                      placeholderTextColor={colors.grayColor}
+                      onChangeText={setFirstName}
+                      value={firstName}
+                      style={{ color: colors.blackColor }}
+                    />
+                  </View>
+                </View>
+              </View>
+              <View style={{ width: "48%", marginRight: spacings.large, }}>
+                <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{LAST_NAME}</Text>
+                <View style={[styles.halfInput, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: colors.grayColor }]}>
+                  <View>
+                    <Ionicons name={"person-sharp"} size={20} color={blackColor} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <TextInput
+                      placeholder={LAST_NAME}
+                      placeholderTextColor={colors.grayColor}
+                      onChangeText={setLastName}
+                      value={lastName}
+                      style={{ color: colors.blackColor }}
+                    />
+                  </View>
+                </View>
+              </View>
+            </View>
+            <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{"Phone Number"}</Text>
+            <View style={[styles.input, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: colors.grayColor }]}>
+              <View>
+                <MaterialCommunityIcons name={"phone"} size={20} color={blackColor} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <TextInput
+                  placeholder="Enter your Phone Number"
+                  placeholderTextColor={colors.grayColor}
+                  onChangeText={setPhone}
+                  value={phone}
+                  keyboardType="phone-pad"
+                  style={{ color: colors.blackColor }}
+                  maxLength={10}
+                />
+              </View>
+            </View>
+            <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{EMAIL}</Text>
+            <View style={[styles.input, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: colors.grayColor }]}>
+              <View>
+                <MaterialCommunityIcons name={"email-outline"} size={20} color={emailError ? redColor : blackColor} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <TextInput
+                  placeholder={"Enter your Email"}
+                  placeholderTextColor={colors.grayColor}
+                  onChangeText={setEmail}
+                  value={email}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  style={{ color: colors.blackColor }}
+                />
+              </View>
+            </View>
+            {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+            <View style={[flexDirectionRow]}>
+              <View style={{ width: "48%", marginRight: spacings.large, }}>
+                <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{PASSWORD}</Text>
+                <View style={[styles.halfInput, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: colors.grayColor }]}>
+                  <View>
+                    <MaterialCommunityIcons name={"lock"} size={20} color={passwordError ? redColor : blackColor} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <TextInput
+                      placeholder={"Current"}
+                      placeholderTextColor={colors.grayColor}
+                      onChangeText={setPassword}
+                      value={password}
+                      secureTextEntry={!showPassword}
+                      style={{ color: colors.blackColor }}
+                    />
+                  </View>
+                  <TouchableOpacity onPress={toggleShowPassword}>
+                    <MaterialCommunityIcons name={showPassword ? "eye" : "eye-off"} size={20} color={grayColor} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={{ width: "48%", marginRight: spacings.large, }}>
+                <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{CONFIRM_PASSWORD}</Text>
+                <View style={[styles.halfInput, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: colors.grayColor }]}>
+                  <View >
+                    <MaterialCommunityIcons name={"lock"} size={20} color={confirmPasswordError ? redColor : blackColor} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <TextInput
+                      placeholder={"Confirm"}
+                      placeholderTextColor={colors.grayColor}
+                      onChangeText={setConfirmPassword}
+                      value={confirmPassword}
+                      secureTextEntry={!showConfirmPassword}
+                      style={{ color: colors.blackColor }}
+                    />
+                  </View>
+                  <TouchableOpacity onPress={toggleShowConfirmPassword}>
+                    <MaterialCommunityIcons name={showConfirmPassword ? "eye" : "eye-off"} size={20} color={colors.grayColor} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+            {confirmPasswordError || error || passwordError ? <Text style={styles.errorText}>{confirmPasswordError || error || passwordError}</Text> : null}
+            <Pressable style={[styles.button, alignItemsCenter, borderRadius5]} onPress={handleSendOtp}>
+              <Text style={styles.buttonText}>{"Register"}</Text>
+            </Pressable>
+
+            <View style={[alignJustifyCenter, {}]}>
+              <View style={[flexDirectionRow, alignJustifyCenter, { width: "100%", marginVertical: 10 }]}>
                 <View style={{ height: 1, backgroundColor: colors.grayColor, width: "46%" }}></View>
-                <Text style={[{ color: colors.blackColor, marginVertical: spacings.xxxxLarge, marginHorizontal: spacings.small }, textAlign]}>{"Or"}</Text>
+                <Text style={[{ color: colors.blackColor, margin: spacings.small }, textAlign]}>{"Or"}</Text>
                 <View style={{ height: 1, backgroundColor: colors.grayColor, width: "46%" }}></View>
               </View>
               <View style={[styles.socialAuthBox, alignJustifyCenter, flexDirectionRow]}>
@@ -355,204 +501,55 @@ const RegisterScreen = ({ navigation }: { navigation: any }) => {
                 </TouchableOpacity>}
               </View>
             </View>
-          </>
-          :
-          <>
-            <TouchableOpacity style={[positionAbsolute, styles.backIcon]} onPress={() => { logEvent(`Back Button Pressed from Register`), navigation.goBack() }}>
-              <Ionicons name={"arrow-back"} size={33} color={colors.blackColor} />
-            </TouchableOpacity>
-            <View style={[styles.logoBox, alignJustifyCenter]}>
-              <Text style={[styles.text, { color: colors.blackColor }]}>Get Started With</Text>
-              <Text style={[styles.text, { color: redColor }]}>{APP_NAME}</Text>
-            </View>
-            <View style={[styles.textInputBox]}>
-              <View style={[flexDirectionRow]}>
-                <View style={{ width: "48%", marginRight: spacings.large, }}>
-                  <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{FIRST_NAME}</Text>
-                  <View style={[styles.halfInput, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: colors.grayColor }]}>
-                    <View>
-                      <Ionicons name={"person-sharp"} size={20} color={blackColor} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <TextInput
-                        placeholder={FIRST_NAME}
-                        placeholderTextColor={colors.grayColor}
-                        onChangeText={setFirstName}
-                        value={firstName}
-                        style={{ color: colors.blackColor }}
-                      />
-                    </View>
-                  </View>
-                </View>
-                <View style={{ width: "48%", marginRight: spacings.large, }}>
-                  <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{LAST_NAME}</Text>
-                  <View style={[styles.halfInput, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: colors.grayColor }]}>
-                    <View>
-                      <Ionicons name={"person-sharp"} size={20} color={blackColor} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <TextInput
-                        placeholder={LAST_NAME}
-                        placeholderTextColor={colors.grayColor}
-                        onChangeText={setLastName}
-                        value={lastName}
-                        style={{ color: colors.blackColor }}
-                      />
-                    </View>
-                  </View>
-                </View>
-              </View>
-              <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{"Phone Number"}</Text>
-              <View style={[styles.input, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: colors.grayColor }]}>
-                <View>
-                  <MaterialCommunityIcons name={"phone-classic"} size={20} color={blackColor} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <TextInput
-                    placeholder="Phone Number"
-                    placeholderTextColor={colors.grayColor}
-                    onChangeText={setPhone}
-                    value={phone}
-                    keyboardType="phone-pad"
-                    style={{ color: colors.blackColor }}
-                    maxLength={10}
-                  />
-                </View>
-              </View>
-              <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{EMAIL}</Text>
-              <View style={[styles.input, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: colors.grayColor }]}>
-                <View>
-                  <MaterialCommunityIcons name={"email-outline"} size={20} color={emailError ? redColor : blackColor} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <TextInput
-                    placeholder={EMAIL}
-                    placeholderTextColor={colors.grayColor}
-                    onChangeText={setEmail}
-                    value={email}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    style={{ color: colors.blackColor }}
-                  />
-                </View>
-              </View>
-              {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-              <View style={[flexDirectionRow]}>
-                <View style={{ width: "48%", marginRight: spacings.large, }}>
-                  <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{PASSWORD}</Text>
-                  <View style={[styles.halfInput, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: colors.grayColor }]}>
-                    <View>
-                      <MaterialCommunityIcons name={"lock"} size={20} color={passwordError ? redColor : blackColor} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <TextInput
-                        placeholder={PASSWORD}
-                        placeholderTextColor={colors.grayColor}
-                        onChangeText={setPassword}
-                        value={password}
-                        secureTextEntry={!showPassword}
-                        style={{ color: colors.blackColor }}
-                      />
-                    </View>
-                    <TouchableOpacity onPress={toggleShowPassword}>
-                      <MaterialCommunityIcons name={showPassword ? "eye" : "eye-off"} size={20} color={grayColor} />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <View style={{ width: "48%", marginRight: spacings.large, }}>
-                  <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{CONFIRM_PASSWORD}</Text>
-                  <View style={[styles.halfInput, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: colors.grayColor }]}>
-                    <View >
-                      <MaterialCommunityIcons name={"lock"} size={20} color={confirmPasswordError ? redColor : blackColor} />
-                    </View>
-                    <View style={{ flex: 1 }}>
-                      <TextInput
-                        placeholder={CONFIRM_PASSWORD}
-                        placeholderTextColor={colors.grayColor}
-                        onChangeText={setConfirmPassword}
-                        value={confirmPassword}
-                        secureTextEntry={!showConfirmPassword}
-                        style={{ color: colors.blackColor }}
-                      />
-                    </View>
-                    <TouchableOpacity onPress={toggleShowConfirmPassword}>
-                      <MaterialCommunityIcons name={showConfirmPassword ? "eye" : "eye-off"} size={20} color={colors.grayColor} />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-              {confirmPasswordError || error || passwordError ? <Text style={styles.errorText}>{confirmPasswordError || error || passwordError}</Text> : null}
-              <Pressable style={[styles.button, alignItemsCenter, borderRadius5]} onPress={handleSendOtp}>
-                <Text style={styles.buttonText}>{"Register"}</Text>
-              </Pressable>
-
-              <View style={[alignJustifyCenter, { height: hp(9), marginVertical: spacings.Large1x }]}>
-                <View style={[flexDirectionRow, alignJustifyCenter, { width: "100%", marginTop: spacings.large }]}>
-                  <View style={{ height: 1, backgroundColor: colors.grayColor, width: "46%" }}></View>
-                  <Text style={[{ color: colors.blackColor, margin: spacings.small }, textAlign]}>{"Or"}</Text>
-                  <View style={{ height: 1, backgroundColor: colors.grayColor, width: "46%" }}></View>
-                </View>
-                <View style={[styles.socialAuthBox, alignJustifyCenter, flexDirectionRow]}>
-                  <TouchableOpacity style={[styles.socialButton, alignJustifyCenter]} onPress={googleSignUp}>
-                    <Image source={GOOGLE_LOGO_IMAGE} style={[{ width: wp(6), height: hp(4) }, resizeModeContain]} />
-                  </TouchableOpacity>
-                  {Platform.OS === 'ios' && <TouchableOpacity style={[styles.socialButton, alignJustifyCenter]} >
-                    <Image source={APPLE_LOGO_IMAGE} style={[{ width: wp(6), height: hp(4) }, resizeModeContain]} />
-                  </TouchableOpacity>}
-                </View>
-              </View>
-              <Pressable style={[{ width: "100%", height: hp(6) }, alignJustifyCenter]} onPress={() => { logEvent('SignUp Button clicked From Login Screen'), navigation.navigate("Login") }}>
-                <Text style={[{ marginTop: spacings.Large1x, color: colors.blackColor }]}>{ALREADY_HAVE_AN_ACCOUNT}<Text style={[{ color: colors.redColor }]}>{LOGIN}</Text></Text>
-              </Pressable>
-              <View style={[positionAbsolute, alignJustifyCenter, { bottom: 20, width: "100%" }]}>
-                <Text style={[{ color: colors.blackColor }, textAlign]}>{BY_CONTINUING_YOU_AGREE}</Text>
-                <View style={[flexDirectionRow, { marginTop: spacings.large, width: "100%" }, alignJustifyCenter]}>
-                  <TouchableOpacity onPress={() => {
-                    navigation.navigate('WebViewScreen', {
-                      headerText: TERM_OF_SERVICES
-                    }),
-                      logEvent('Terms Of Services From login');
-                  }}>
-                    <Text style={[{ color: colors.blackColor, margin: 4 }, textDecorationUnderline]}>{TERM_OF_SERVICES}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => {
-                    navigation.navigate('WebViewScreen', {
-                      headerText: PRIVACY_POLICY
-                    }),
-                      logEvent('Privacy Ploicy From login');
-                  }}>
-                    <Text style={[{ color: colors.blackColor, margin: 4 }, textDecorationUnderline]}>{PRIVACY_POLICY}</Text>
-                  </TouchableOpacity>
-
-                </View>
+            <Pressable style={[{ width: "100%" }, alignJustifyCenter]} onPress={onBackToLogin}>
+              <Text style={[{ marginTop: 6, color: colors.blackColor }]}>{ALREADY_HAVE_AN_ACCOUNT}<Text style={[{ color: colors.redColor }]}>{LOGIN}</Text></Text>
+            </Pressable>
+            <View style={[positionAbsolute, alignJustifyCenter, { bottom: 40, width: "100%" }]}>
+              <Text style={[{ color: colors.blackColor }, textAlign]}>{BY_CONTINUING_YOU_AGREE}</Text>
+              <View style={[flexDirectionRow, { marginTop: 5, width: "100%" }, alignJustifyCenter]}>
+                <TouchableOpacity onPress={() => {
+                  navigation.navigate('WebViewScreen', {
+                    headerText: TERM_OF_SERVICES
+                  }),
+                    logEvent('Terms Of Services From login');
+                }}>
+                  <Text style={[{ color: colors.redColor, margin: 4 }, textDecorationUnderline]}>{TERM_OF_SERVICES}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                  navigation.navigate('WebViewScreen', {
+                    headerText: PRIVACY_POLICY
+                  }),
+                    logEvent('Privacy Policy From login');
+                }}>
+                  <Text style={[{ color: colors.redColor, margin: 4 }, textDecorationUnderline]}>{PRIVACY_POLICY}</Text>
+                </TouchableOpacity>
               </View>
             </View>
-          </>}
-
-        {loading &&
-          <LoadingModal visible={loading} />
-        }
-        {successModalVisible && <SuccessModal
-          visible={successModalVisible}
-          onClose={() => setSuccessModalVisible(false)}
-          onPressContinue={handleSignUp}
-        />}
-      </KeyboardAvoidingView>
-    </ImageBackground>
+          </View>
+        </>}
+      {loading &&
+        <LoadingModal visible={loading} />
+      }
+      {successModalVisible && <SuccessModal
+        visible={successModalVisible}
+        onClose={() => setSuccessModalVisible(false)}
+        onPressContinue={handleSignUp}
+      />}
+    </KeyboardAvoidingView>
 
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    paddingHorizontal: 20,
     width: wp(100),
     height: hp(100)
   },
   logoBox: {
     width: "100%",
-    height: hp(15),
-    marginVertical: spacings.xxxLarge
+    height: hp(10),
+    marginBottom: spacings.xxxLarge
   },
   text: {
     fontSize: style.fontSizeLarge2x.fontSize,
@@ -597,19 +594,19 @@ const styles = StyleSheet.create({
   errorText: {
     color: redColor
   },
-  backIcon: {
-    top: 15,
-    left: 10,
-    width: wp(10),
-    height: hp(5)
-  },
+  // backIcon: {
+  //   top: 15,
+  //   left: 10,
+  //   width: wp(10),
+  //   height: hp(5)
+  // },
   socialAuthBox: {
     width: '100%',
-    marginTop: spacings.xxLarge
+    // marginTop: spacings.xxLarge
   },
   socialButton: {
     width: wp(12),
-    height: wp(12),
+    height: wp(10),
     borderRadius: 10,
     borderWidth: .5,
     borderColor: grayColor,

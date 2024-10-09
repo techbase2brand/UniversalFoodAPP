@@ -264,59 +264,61 @@ const UserDashboardScreen = () => {
         {
           route.params?.from === "Saved" &&
           (wishList && wishList.length > 0 ?
-            <View style={[styles.detailsBox]}>
-              <FlatList
-                data={wishList}
-                keyExtractor={(item) => item?.id?.toString()}
-                numColumns={2}
-                renderItem={({ item, index }) => {
-                  const imageUrl = item?.images?.edges ? item?.images?.edges?.[0]?.node?.url : item?.images?.nodes ? item?.images?.nodes?.[0]?.url : item?.images?.[0]?.src ? item?.images?.[0]?.src : item.imageUrls[0]
-                  const itemPrice = item?.variants?.edges?.[0]?.node?.price?.amount ?? item?.variants?.nodes?.[0]?.price ?? item?.variants?.[0]?.price;
-                  const itemCurrencyCode = item?.variants?.edges?.[0]?.node?.price?.currencyCode ?? null;
-                  const inventoryQuantity = item?.variants?.nodes ? item?.variants?.nodes[0]?.inventoryQuantity : (item?.variants?.[0]?.inventory_quantity ? item?.variants?.[0]?.inventory_quantity : (Array.isArray(item?.inventoryQuantity) ? item?.inventoryQuantity[0] : item?.inventoryQuantity));
-                  const variantId = item?.variants?.edges ? item?.variants.edges[0]?.node.id : item?.variants?.nodes ? item?.variants?.nodes[0]?.id : item?.variants?.[0]?.admin_graphql_api_id ? item?.variants[0]?.admin_graphql_api_id : item.variantId[0];
-                  return (
-                    <View style={[styles.itemContainer, { backgroundColor: isDarkMode ? grayColor : whiteColor }]}>
-                      <Pressable style={[positionAbsolute, styles.favButton]} onPress={() => handlePress(item)}>
-                        <AntDesign
-                          name={"heart"}
-                          size={20}
-                          color={colors.redColor}
+            <>
+              <View style={{ width: wp(100), height: 5, backgroundColor: whiteColor }} />
+              <View style={[styles.detailsBox]}>
+                <FlatList
+                  data={wishList}
+                  keyExtractor={(item) => item?.id?.toString()}
+                  numColumns={2}
+                  renderItem={({ item, index }) => {
+                    const imageUrl = item?.images?.edges ? item?.images?.edges?.[0]?.node?.url : item?.images?.nodes ? item?.images?.nodes?.[0]?.url : item?.images?.[0]?.src ? item?.images?.[0]?.src : item.imageUrls[0]
+                    const itemPrice = item?.variants?.edges?.[0]?.node?.price?.amount ?? item?.variants?.nodes?.[0]?.price ?? item?.variants?.[0]?.price;
+                    const itemCurrencyCode = item?.variants?.edges?.[0]?.node?.price?.currencyCode ?? null;
+                    const inventoryQuantity = item?.variants?.nodes ? item?.variants?.nodes[0]?.inventoryQuantity : (item?.variants?.[0]?.inventory_quantity ? item?.variants?.[0]?.inventory_quantity : (Array.isArray(item?.inventoryQuantity) ? item?.inventoryQuantity[0] : item?.inventoryQuantity));
+                    const variantId = item?.variants?.edges ? item?.variants.edges[0]?.node.id : item?.variants?.nodes ? item?.variants?.nodes[0]?.id : item?.variants?.[0]?.admin_graphql_api_id ? item?.variants[0]?.admin_graphql_api_id : item.variantId[0];
+                    return (
+                      <View style={[styles.itemContainer, { backgroundColor: isDarkMode ? grayColor : whiteColor }]}>
+                        <Pressable style={[positionAbsolute, styles.favButton]} onPress={() => handlePress(item)}>
+                          <AntDesign
+                            name={"heart"}
+                            size={20}
+                            color={colors.redColor}
+                          />
+                        </Pressable>
+                        <Image
+                          source={{ uri: imageUrl }}
+                          style={[styles.productImage, resizeModeContain]}
                         />
-                      </Pressable>
-                      <Image
-                        source={{ uri: imageUrl }}
-                        style={[styles.productImage, resizeModeContain]}
-                      />
-                      <View style={{ width: "100%", height: hp(7), justifyContent: "center", marginTop: 15 }}>
-                        <Text style={[styles.wishListItemName, { color: colors.blackColor, paddingLeft: spacings.large }]}>{trimcateText(item?.title)}</Text>
-                        <Text style={[styles.wishListItemName, { color: colors.blackColor, fontWeight: "300", paddingLeft: spacings.large }]}>1 Product</Text>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-                          <View>
-                            <Text style={[styles.wishListItemPrice, { color: colors.blackColor, paddingLeft: spacings.large }]}>{item.price?.[0] ? item.price?.[0] : itemPrice} <Text style={[styles.wishListItemPrice, { color: colors.blackColor }]}>{itemCurrencyCode ? itemCurrencyCode : shopCurrency}</Text></Text>
-                          </View>
-                          <View style={[{ flexDirection: "row", justifyContent: "space-between" }]}>
-                            {inventoryQuantity <= 0 ? <Pressable
-                              style={[styles.addtocartButton, borderRadius10, alignJustifyCenter]}
-                            >
-                              <Text style={styles.addToCartButtonText}>Out of stock</Text>
-                            </Pressable>
-                              : <Pressable
-                                // style={[styles.addtocartButton]}
-                                onPress={() => addToCartProduct(item, 1)}
+                        <View style={{ width: "100%", height: hp(7), justifyContent: "center", marginTop: 15 }}>
+                          <Text style={[styles.wishListItemName, { color: colors.blackColor, paddingLeft: spacings.large }]}>{trimcateText(item?.title)}</Text>
+                          <Text style={[styles.wishListItemName, { color: colors.blackColor, fontWeight: "300", paddingLeft: spacings.large }]}>1 Product</Text>
+                          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                            <View>
+                              <Text style={[styles.wishListItemPrice, { color: colors.blackColor, paddingLeft: spacings.large }]}>{item.price?.[0] ? item.price?.[0] : itemPrice} <Text style={[styles.wishListItemPrice, { color: colors.blackColor }]}>{itemCurrencyCode ? itemCurrencyCode : shopCurrency}</Text></Text>
+                            </View>
+                            <View style={[{ flexDirection: "row", justifyContent: "space-between" }]}>
+                              {inventoryQuantity <= 0 ? <Pressable
+                                style={[styles.addtocartButton, borderRadius10, alignJustifyCenter]}
                               >
-                                {loadingProductId === variantId ? <ActivityIndicator size="small" color={whiteColor} /> :
-                                  <Image
-                                    source={ADD_TO_CART_IMG}
-                                    style={{ height: 45, width: 45, resizeMode: "contain" }}
-                                  />
-                                  // <Text style={styles.addToCartButtonText}>Add To Cart</Text>
-                                }
-                              </Pressable>}
+                                <Text style={styles.addToCartButtonText}>Out of stock</Text>
+                              </Pressable>
+                                : <Pressable
+                                  // style={[styles.addtocartButton]}
+                                  onPress={() => addToCartProduct(item, 1)}
+                                >
+                                  {loadingProductId === variantId ? <ActivityIndicator size="small" color={whiteColor} /> :
+                                    <Image
+                                      source={ADD_TO_CART_IMG}
+                                      style={{ height: 45, width: 45, resizeMode: "contain" }}
+                                    />
+                                    // <Text style={styles.addToCartButtonText}>Add To Cart</Text>
+                                  }
+                                </Pressable>}
+                            </View>
                           </View>
                         </View>
-                      </View>
-                      {/* <View style={[{ width: "100%", flexDirection: "row", paddingTop: spacings.large }, alignJustifyCenter]}>
+                        {/* <View style={[{ width: "100%", flexDirection: "row", paddingTop: spacings.large }, alignJustifyCenter]}>
                         {inventoryQuantity <= 0 ? <Pressable
                           style={[styles.addtocartButton, borderRadius10, alignJustifyCenter]}
                         >
@@ -330,22 +332,27 @@ const UserDashboardScreen = () => {
                               <Text style={styles.addToCartButtonText}>Add To Cart</Text>}
                           </Pressable>}
                       </View> */}
-                    </View>
-                  );
-                }}
-              />
-            </View> :
-            <View style={[styles.centeredContainer, alignJustifyCenter, { width: wp(80), alignSelf: "center" }]}>
-              <View>
-                <AntDesign
-                  name={"hearto"}
-                  size={50}
-                  color={colors.mediumGray}
+                      </View>
+
+                    );
+                  }}
                 />
               </View>
-              <Text style={{ color: colors.blackColor, fontSize: style.fontSizeLarge.fontSize }}>No Saved found.</Text>
-              <Text style={{ color: colors.mediumGray, textAlign: "center" }}>You don’t have any saved items. Go to home and add some.</Text>
-            </View>)
+            </> :
+            <>
+              <View style={{ width: wp(100), height: 5, backgroundColor: whiteColor }} />
+              <View style={[styles.centeredContainer, alignJustifyCenter, { width: wp(80), alignSelf: "center" }]}>
+                <View>
+                  <AntDesign
+                    name={"hearto"}
+                    size={50}
+                    color={colors.mediumGray}
+                  />
+                </View>
+                <Text style={{ color: colors.blackColor, fontSize: style.fontSizeLarge.fontSize }}>No Saved found.</Text>
+                <Text style={{ color: colors.mediumGray, textAlign: "center" }}>You don’t have any saved items. Go to home and add some.</Text>
+              </View>
+            </>)
         }
         {
           route.params?.from === SHIPPING_ADDRESS &&

@@ -46,7 +46,7 @@ ndkVersion = "23.1.7779620"
 
 android {
   if (supportsNamespace()) {
-    namespace "com.Warley.checkoutsheetkit"
+    namespace "com.UniversalFood.checkoutsheetkit"
 
     sourceSets {
       main {

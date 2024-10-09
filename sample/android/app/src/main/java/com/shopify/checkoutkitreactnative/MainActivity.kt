@@ -1,4 +1,4 @@
-package com.Warley
+package com.UniversalFood
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

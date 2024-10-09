@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, View, StyleSheet, Text, Image, ActivityIndicator, Pressable, RefreshControl, TouchableOpacity, ImageBackground, FlatList, Alert } from 'react-native';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { SafeAreaView, ScrollView, View, StyleSheet, Text, Image, ActivityIndicator, Pressable, RefreshControl, TouchableOpacity, ImageBackground, FlatList, Alert, Animated, Modal } from 'react-native';
 import Icon from 'react-native-vector-icons/Entypo';
 import { useShopifyCheckoutSheet } from '@shopify/checkout-sheet-kit';
 import useShopify from '../hooks/useShopify';
@@ -29,8 +29,9 @@ import { addToWishlist, removeFromWishlist } from '../redux/actions/wishListActi
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ChatButton from '../components/ChatButton';
 import PushNotification from 'react-native-push-notification';
+import LoginModal from '../components/Modal/LoginModal'
 
-const { flex, alignJustifyCenter, flexDirectionRow, resizeModeCover, justifyContentSpaceBetween, borderRadius10, alignItemsCenter, borderRadius5, textAlign, alignItemsFlexEnd, resizeModeContain } = BaseStyle;
+const { flex, alignJustifyCenter, flexDirectionRow, resizeModeCover, positionAbsolute, justifyContentSpaceBetween, borderRadius10, alignItemsCenter, borderRadius5, textAlign, alignItemsFlexEnd, resizeModeContain } = BaseStyle;
 
 function CartScreen({ navigation }: { navigation: any }): React.JSX.Element {
   const { isDarkMode } = useThemes();
@@ -48,7 +49,28 @@ function CartScreen({ navigation }: { navigation: any }): React.JSX.Element {
   const [loadingProductId, setLoadingProductId] = useState(null);
   const wishList = useSelector(state => state.wishlist.wishlist);
   const [shopCurrency, setShopCurrency] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const slideAnim = useRef(new Animated.Value(500)).current;  // Initial position off-screen
 
+  const openModal = () => {
+    setModalVisible(true);
+    // Animate from bottom to top
+    Animated.timing(slideAnim, {
+      toValue: 0, // Slide to the top
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeModal = () => {
+    Animated.timing(slideAnim, {
+      toValue: 720, // Slide back to bottom
+      duration: 500,
+      useNativeDriver: true,
+    }).start(() => {
+      setModalVisible(false);
+    });
+  };
   useEffect(() => {
     if (cartId) {
       fetchCart({
@@ -129,7 +151,7 @@ function CartScreen({ navigation }: { navigation: any }): React.JSX.Element {
   };
 
   const fetchProductMetafields = async (productID) => {
-     try {
+    try {
       const response = await axios.get(`https://${STOREFRONT_DOMAIN}/admin/api/2024-07/products/${productID}/metafields.json`, {
         headers: {
           'X-Shopify-Access-Token': ADMINAPI_ACCESS_TOKEN,
@@ -180,7 +202,7 @@ function CartScreen({ navigation }: { navigation: any }): React.JSX.Element {
 
   useEffect(() => {
     logEvent('CartScreen');
-    fetchCartDetail();
+    // fetchCartDetail();
   }, [])
 
   const onRefresh = useCallback(() => {
@@ -243,7 +265,8 @@ function CartScreen({ navigation }: { navigation: any }): React.JSX.Element {
         <Header
           backIcon={true}
           navigation={navigation}
-          text={"Cart"} />
+          text={"Cart"}
+          textinput={true} />
         <View style={[flex, alignJustifyCenter]}>
           <ActivityIndicator size="small" />
           <Text style={styles.loadingText}>{LOADING_CART}</Text>
@@ -258,7 +281,8 @@ function CartScreen({ navigation }: { navigation: any }): React.JSX.Element {
         <Header
           backIcon={true}
           navigation={navigation}
-          text={"Cart"} />
+          text={"Cart"}
+          textinput={true} />
         <View style={[flex, alignJustifyCenter]}>
           <Icon name="shopping-bag" size={60} color={themecolors.lightShadeBlue} />
           <Text style={[styles.loadingText, { color: themecolors.blackColor }]}>{YOUR_CART_IS_EMPTY}</Text>
@@ -342,12 +366,14 @@ function CartScreen({ navigation }: { navigation: any }): React.JSX.Element {
   };
 
   return (
-    <ImageBackground source={isDarkMode ? "" : BACKGROUND_IMAGE} style={[styles.loading, alignJustifyCenter, flex, { backgroundColor: themecolors.whiteColor }]}>
-      <SafeAreaView>
+    <ImageBackground source={isDarkMode ? "" : BACKGROUND_IMAGE} style={[styles.loading, flex, { backgroundColor: themecolors.whiteColor }]}>
+      <SafeAreaView >
         <Header
           backIcon={true}
           navigation={navigation}
-          text={"Cart"} />
+          text={"Cart"}
+          textinput={true} />
+        <View style={{width:"100%",height:5,backgroundColor:whiteColor}}></View>
         <View style={{ height: hp(80) }}>
           <ScrollView
             contentInsetAdjustmentBehavior="automatic"
@@ -440,7 +466,42 @@ function CartScreen({ navigation }: { navigation: any }): React.JSX.Element {
                 />
                 <Text>Loading Products...</Text>
               </View>} */}
-            <View style={styles.costContainer}>
+            {/* <View style={styles.costContainer}>
+              <View style={[styles.costBlock, justifyContentSpaceBetween, flexDirectionRow]}>
+                <Text style={styles.costBlockText}>{SUBTOTAL}</Text>
+                <Text style={[styles.costBlockText, { color: themecolors.blackColor }]}>
+                  {getTotalAmount().totalAmount} {getTotalAmount().currencyCode}
+                </Text>
+              </View>
+
+              <View style={[styles.costBlock, justifyContentSpaceBetween, flexDirectionRow]}>
+                <Text style={styles.costBlockText}>{TAXES}</Text>
+                <Text style={[styles.costBlockText, { color: themecolors.blackColor }]}>
+                  {price(data?.cart?.cost?.totalTaxAmount)}
+                </Text>
+              </View>
+
+              <View style={[styles.costBlock, justifyContentSpaceBetween, flexDirectionRow, { borderTopColor: colors.border, borderTopWidth: 1, marginTop: spacings.large }]}>
+                <Text style={[styles.costBlockTextStrong, { color: themecolors.blackColor }]}>{TOTAL}</Text>
+                <Text style={[styles.costBlockTextStrong, { color: themecolors.blackColor }]}>
+                  {sum.toFixed(2)} {getTotalAmount().currencyCode}
+                </Text>
+              </View>
+              <Text style={{
+                fontSize: style.fontSizeNormal1x.fontSize,
+                marginVertical: spacings.Large2x,
+                fontWeight: style.fontWeightThin1x.fontWeight,
+                lineHeight: 20,
+                color: themecolors.blackColor,
+              }}>Note : Shipping will be calculated at checkout.</Text>
+
+            </View> */}
+          </ScrollView>
+          <ChatButton onPress={handleChatButtonPress} bottom={wp(1)} />
+        </View>
+        {/* {totalQuantity > 0 && (
+          <View style={{position:"absolute", bottom:-70, borderWidth:1 ,borderBottomWidth:0, borderColor:"#797979", borderRadius:8, width:"100%", backgroundColor:"#f1efef"}}>
+ <View style={styles.costContainer}>
               <View style={[styles.costBlock, justifyContentSpaceBetween, flexDirectionRow]}>
                 <Text style={styles.costBlockText}>{SUBTOTAL}</Text>
                 <Text style={[styles.costBlockText, { color: themecolors.blackColor }]}>
@@ -470,18 +531,55 @@ function CartScreen({ navigation }: { navigation: any }): React.JSX.Element {
               }}>Note : Shipping will be calculated at checkout.</Text>
 
             </View>
-          </ScrollView>
-          <ChatButton onPress={handleChatButtonPress} />
-        </View>
-        {totalQuantity > 0 && (
           <Pressable
             style={[styles.cartButton, borderRadius10, alignJustifyCenter]}
             disabled={totalQuantity === 0}
             onPress={presentCheckout}>
             <Text style={[styles.cartButtonText, textAlign]}>{CHECKOUT}</Text>
-
           </Pressable>
-        )}
+          </View>
+        )} */}
+
+        <View style={[flexDirectionRow, positionAbsolute, justifyContentSpaceBetween, { alignItems: "baseline", bottom: -100, width: wp(100), zIndex: 1, backgroundColor: themecolors.whiteColor, height: hp(8) }]}>
+          <View style={{ width: wp(40) }}>
+            <View style={[styles.quantityContainer, alignJustifyCenter, { flexDirection: "column", width: wp(40) }]}>
+              <Text style={{ paddingHorizontal: spacings.large, color: themecolors.blackColor, fontSize: style.fontSizeMedium.fontSize, fontWeight: "700" }}>Total: £21.99</Text>
+              <Text style={{ backgroundColor: "#dafbd5", paddingHorizontal: 4, marginTop: 8, borderRadius: 5, color: "#018726" }}><AntDesign
+                name={"tag"}
+                size={15}
+                color={"#018726"}
+              />Saved £21.99 </Text>
+            </View>
+          </View>
+          <View style={[{ position: "absolute", bottom: 10, right: 10, }]}>
+
+            <Pressable
+              style={[styles.addToCartButton, borderRadius10, { backgroundColor: "#018726" }]}
+              onPress={openModal}
+            >
+              <Text style={[textAlign, { color: whiteColor, width: wp(12) }]}>
+                Login
+              </Text>
+            </Pressable>
+          </View>
+          {modalVisible && (
+            <LoginModal modalVisible={modalVisible} closeModal={closeModal} slideAnim={slideAnim} />
+            // <Modal
+            //   transparent={true}
+            //   visible={modalVisible}
+            //   animationType="none"
+            // >
+            //   <View style={styles.modalOverlay}>
+            //     <Animated.View style={[styles.modalContent, { transform: [{ translateY: slideAnim }] }]}>
+            //       <Text style={{}}>Login Form Here</Text>
+            //       <Pressable onPress={closeModal}>
+            //         <Text style={styles.closeButton}>Close</Text>
+            //       </Pressable>
+            //     </Animated.View>
+            //   </View>
+            // </Modal>
+          )}
+        </View>
       </SafeAreaView>
     </ImageBackground>
   );
@@ -541,7 +639,7 @@ function CartItem({
       style={{
         ...styles.productItem,
         ...(loading ? styles.productItemLoading : {}),
-        borderWidth: 1, borderColor: themecolors.mediumGray, backgroundColor: isDarkMode ? grayColor : whiteColor
+        borderWidth: 1, borderColor: "#797979", backgroundColor: isDarkMode ? grayColor : whiteColor
       }}>
       <Image
         resizeMethod="resize"
@@ -553,6 +651,9 @@ function CartItem({
         <View style={[flex]}>
           <Text style={[styles.productTitle, { color: themecolors.blackColor }]}>
             {trimcateText(item?.merchandise?.product?.title)}
+          </Text>
+          <Text style={[{ color: themecolors.blackColor }]}>
+            2 x 16g
           </Text>
           <Text style={[styles.productPrice, { color: themecolors.blackColor }]}>
             {price(item?.merchandise?.price)}
@@ -574,22 +675,22 @@ function CartItem({
           </Pressable> */}
 
 
-          <View style={[styles.quantityContainer, flexDirectionRow, {marginTop:30}]}>
+          <View style={[styles.quantityContainer, flexDirectionRow, { marginTop: 30 }]}>
             <TouchableOpacity onPress={decrementQuantity} >
-            <AntDesign
-              name={"minuscircle"}
-              size={25}
-              color={"#eb4335"}
-            />
+              <AntDesign
+                name={"minuscircle"}
+                size={25}
+                color={"#eb4335"}
+              />
             </TouchableOpacity>
             <Text style={[styles.quantity, { color: themecolors.blackColor }]}>{quantity}</Text>
             <TouchableOpacity onPress={incrementQuantity}  >
               {/* <Text style={[styles.quantityButton, textAlign, { color: whiteColor }]}>+</Text> */}
               <AntDesign
-              name={"pluscircle"}
-              size={25}
-              color={"#eb4335"}
-            />
+                name={"pluscircle"}
+                size={25}
+                color={"#eb4335"}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -601,7 +702,7 @@ function CartItem({
 function createStyles(colors: Colors) {
   return StyleSheet.create({
     loading: {
-      padding: 2,
+
     },
     loadingText: {
       marginVertical: spacings.Large2x,
@@ -653,9 +754,9 @@ function createStyles(colors: Colors) {
     },
     productTitle: {
       fontSize: style.fontSizeNormal1x.fontSize,
-      marginBottom: spacings.small2x,
+      // marginBottom: spacings.small2x,
       fontWeight: style.fontWeightThin1x.fontWeight,
-      lineHeight: 20,
+      // lineHeight: 20,
       color: blackColor,
     },
     productDescription: {
@@ -679,15 +780,14 @@ function createStyles(colors: Colors) {
     productImage: {
       width: wp(20),
       height: hp(10),
-      borderWidth:1
+      borderWidth: 1
     },
     costContainer: {
-      marginBottom: spacings.xLarge,
+      // marginBottom: spacings.xLarge,
       marginHorizontal: spacings.Large1x,
       paddingTop: spacings.xLarge,
-      paddingBottom: hp(10),
+      // paddingBottom: hp(10),
       paddingHorizontal: spacings.xsmall,
-      borderTopWidth: 1,
       borderTopColor: colors.border,
     },
     costBlock: {
@@ -782,6 +882,27 @@ function createStyles(colors: Colors) {
       zIndex: 10,
       borderWidth: 1,
       borderRadius: 10,
+    },
+    addToCartButtonLoading: {
+      width: wp(44)
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)', // Dim the background
+      justifyContent: 'flex-end', // Align modal at the bottom
+    },
+    modalContent: {
+      backgroundColor: 'white',
+      height: '100%',
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      padding: 20,
+    },
+    closeButton: {
+      backgroundColor: '#018726',
+      padding: 10,
+      borderRadius: 10,
+      alignSelf: 'flex-end',
     },
   });
 }

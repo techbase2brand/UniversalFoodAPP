@@ -23,12 +23,12 @@ import dynamicLinks from '@react-native-firebase/dynamic-links';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectMenuItem } from '../redux/actions/menuActions';
 import { useFocusEffect } from '@react-navigation/native';
-import FastImage from 'react-native-fast-image';
 import LoaderKit from 'react-native-loader-kit';
 import { clearWishlist } from '../redux/actions/wishListActions';
 import { useThemes } from '../context/ThemeContext';
 import { lightColors, darkColors } from '../constants/Color';
 import { scheduleNotification } from '../notifications';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 const { flex, alignJustifyCenter, flexDirectionRow, resizeModeCover, justifyContentSpaceBetween, borderRadius10, alignItemsCenter,
   textAlign, overflowHidden } = BaseStyle;
 
@@ -59,6 +59,7 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
   const borderColors = ['#53b175', '#d2b969', '#ed2027', '#a476b6', '#ed2027', '#a476b6', , '#d2b969', , '#a476b6',];
   const collections = shopifyCollection || [];
   const catagory = [...collections.slice(0, 5)];
+
   const productsBest = [
     {
       id: '1',
@@ -69,6 +70,7 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
       image: "https://s3-alpha-sig.figma.com/img/3510/5699/8c766d0c9fa02396676cba1395f67713?Expires=1728864000&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=QnkyaE3bzQdVeQod-vOZEqYvwrofPANEPJeX-LXKdEdCg1jfEAZggXPmXmtoGzSR~jQ-6ZVPs5aZAINJdrRuYIhXRHOTqXEpjlcP5MhoMZy0XWeoJv3dsvthS5gpokS45Om~jgX8IdHy1YDB8AXdSauDoXO1B2fVNAZFEz9pnqjAmeqV7edwZ39KTzBdYolC93pjeQF-3Sc8SD8uL~sRX40BsV4jDQl28ONdSKs7xstz-Tm8-evGfQBDz6ilg4bVofguW-e0I44G-mdoY6GlohocIF1ci~2kGTrzAWSebQc~47jnwrooyAlVzGpAV1iA8xXNa2Qe6X4gNNelDY4B8g__",
     },
   ];
+
   const carouselData = [
     { id: 1, image: "https://firebasestorage.googleapis.com/v0/b/ecommerceapp-34078.appspot.com/o/bannerimages%2FElectronics%2FelectronicsBanner.png?alt=media&token=84b75ba9-326a-4ae1-b24b-03a83e042fe9" },
     { id: 2, image: "https://firebasestorage.googleapis.com/v0/b/ecommerceapp-34078.appspot.com/o/bannerimages%2FElectronics%2FelectronicBanner1.png?alt=media&token=970f5567-1bfc-4781-a743-da6e06992d02" },
@@ -440,62 +442,140 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
     scheduleNotification();
   };
 
+  //handleChatButtonPress
   const handleChatButtonPress = () => {
     logEvent('Chat button clicked in Electronics Home Screen');
     navigation.navigate("ShopifyInboxScreen")
   };
 
+  //onPressSeacrchBar
   const onPressSeacrchBar = () => {
     logEvent("Click on Search Bar");
     navigation.navigate('Search',
       { navigation: navigation })
   }
+
   return (
     <ImageBackground style={[flex, { backgroundColor: colors.whiteColor }]} source={isDarkMode ? '' : BACKGROUND_IMAGE}>
-      <KeyboardAvoidingView style={[flex]} behavior="padding" enabled>
-        <Header
-          navigation={navigation}
-          // textinput={true}
-          image={true}
-          menuImage={true}
-          notification={true}
-          // shoppingCart={true}
-          onPressShopByCatagory={onPressShopAll}
-        />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{ flex: 1 }}
+        stickyHeaderIndices={[1]}
+      >
+        {/* Header */}
+        <View>
+          <Header
+            navigation={navigation}
+            image={true}
+            menuImage={true}
+            notification={true}
+            onPressShopByCatagory={onPressShopAll}
+          />
+        </View>
 
-        <View style={[styles.container, flex]}>
-          <TouchableOpacity style={[styles.input, flexDirectionRow, alignItemsCenter, { backgroundColor: isDarkMode ? colors.grayColor : whiteColor, shadowColor: colors.grayColor }]} onPress={onPressSeacrchBar}>
+        {/* Search Bar (Sticky) */}
+        <View>
+          <TouchableOpacity
+            style={[
+              styles.input,
+              flexDirectionRow,
+              alignItemsCenter,
+              {
+                backgroundColor: isDarkMode ? colors.grayColor : whiteColor,
+                shadowColor: colors.grayColor,
+              },
+            ]}
+            onPress={onPressSeacrchBar}
+          >
+            <View style={[flex]}>
+              <Text style={{ color: isDarkMode ? whiteColor : blackColor }}> {SEARCH}</Text>
+            </View>
             <Image
               source={WARLEY_SEARCH}
               style={{ width: wp(4), height: hp(5), resizeMode: 'contain', marginRight: 5 }}
             />
-            <View style={[flex]}>
-              <Text style={{ color: isDarkMode ? whiteColor : blackColor }}> {SEARCH}</Text>
-            </View>
           </TouchableOpacity>
-          <ScrollView showsVerticalScrollIndicator={false} style={{ paddingHorizontal: spacings.large }}>
-            <Carousal
-              data={carouselData.slice(0, 3)}
-              dostsShow={true}
-              renderItem={item => (
-                <Image source={{ uri: item?.image }} style={[{ width: wp(91.4), height: hp(20) }, borderRadius10, resizeModeCover]} />
-              )}
+        </View>
+
+        <View style={[styles.container, flex]}>
+
+          {/* bannerCarousal */}
+          <Carousal
+            data={carouselData.slice(0, 3)}
+            dostsShow={true}
+            renderItem={item => (
+              <Image source={{ uri: item?.image }} style={[{ width: wp(95), height: hp(20), resizeMode: "cover" }, borderRadius10]} />
+            )}
+          />
+
+          {/* Shop by BRANDS */}
+          <View style={[{ width: "100%", marginVertical: 10 }, alignItemsCenter, justifyContentSpaceBetween, flexDirectionRow]}>
+            <Text style={[styles.text, { color: colors.blackColor }]}>{SHOP_BY}<Text style={{ color: redColor }}>{BRANDS}</Text> </Text>
+            <Pressable onPress={onPressShopAll}>
+              <Text style={{ color: "#717171", fontSize: style.fontSizeNormal.fontSize, fontWeight: style.fontWeightThin1x.fontWeight }} >{SHOW_ALL}</Text>
+            </Pressable>
+          </View>
+          {/* <View style={[{ width: wp(100), height: "auto", marginTop: 5, paddingHorizontal: spacings.large }, flexDirectionRow]}>
+            <FlatList
+              data={catagory}
+              renderItem={({ item, index }) => {
+                const borderColor = borderColors[index % borderColors.length];
+                return (
+                  <View style={[{ width: wp(24), height: hp(14) },]}>
+                    <Pressable
+                      style={[styles.categoryCard, overflowHidden, alignJustifyCenter, { backgroundColor: whiteColor, borderColor: isDarkMode ? whiteColor : borderColor, borderWidth: isDarkMode ? 1 : 1 }]}
+                      onPress={() =>
+                        item.id === 'more'
+                          ? onPressShopAll()
+                          : onPressCollection(item?.id, item?.title)
+                      }
+                    >
+                      <Image
+                        source={
+                          { uri: item.image.url }
+                        }
+                        style={
+                          [styles.categoryImage, { resizeMode: "contain" }]
+                        }
+                      />
+                    </Pressable>
+
+                  </View>
+                );
+              }}
+              showsHorizontalScrollIndicator={false}
+              horizontal
+              keyExtractor={(item) => item?.id}
             />
-            <View style={[{ width: "100%", marginVertical: 10 }, alignItemsCenter, justifyContentSpaceBetween, flexDirectionRow]}>
-              <Text style={[styles.text, { color: colors.blackColor }]}>{SHOP_BY}<Text style={{ color: redColor }}>{BRANDS}</Text> </Text>
-              <Pressable onPress={onPressShopAll}>
-                <Text style={{ color: "#717171", fontSize: style.fontSizeNormal.fontSize, fontWeight: style.fontWeightThin1x.fontWeight }} >{SHOW_ALL}</Text>
-              </Pressable>
-            </View>
-            <View style={[{ width: wp(100), height: "auto", marginTop: 5, paddingHorizontal: spacings.large }, flexDirectionRow]}>
+          </View> */}
+          <View style={[{ width: wp(100), height: "auto", marginTop: 5, paddingHorizontal: spacings.large }, flexDirectionRow]}>
+            {catagory.length === 0 ? (
+              <SkeletonPlaceholder>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <View style={{ width: wp(24), height: hp(14), borderRadius: 10, marginRight: 10 }} />
+                  <View style={{ width: wp(24), height: hp(14), borderRadius: 10, marginRight: 10 }} />
+                  <View style={{ width: wp(24), height: hp(14), borderRadius: 10, marginRight: 10 }} />
+                  <View style={{ width: wp(24), height: hp(14), borderRadius: 10, marginRight: 10 }} />
+                </View>
+              </SkeletonPlaceholder>
+            ) : (
               <FlatList
                 data={catagory}
                 renderItem={({ item, index }) => {
                   const borderColor = borderColors[index % borderColors.length];
                   return (
-                    <View style={[{ width: wp(24), height: hp(14) },]}>
+                    <View style={[{ width: wp(24), height: hp(14) }]}>
                       <Pressable
-                        style={[styles.categoryCard, overflowHidden, alignJustifyCenter, { backgroundColor: whiteColor, borderColor: isDarkMode ? whiteColor : borderColor, borderWidth: isDarkMode ? 1 : 1 }]}
+                        style={[
+                          styles.categoryCard,
+                          overflowHidden,
+                          alignJustifyCenter,
+                          {
+                            backgroundColor: whiteColor,
+                            borderColor: isDarkMode ? whiteColor : borderColor,
+                            borderWidth: 1,
+                          },
+                        ]}
                         onPress={() =>
                           item.id === 'more'
                             ? onPressShopAll()
@@ -503,15 +583,10 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
                         }
                       >
                         <Image
-                          source={
-                            { uri: item.image.url }
-                          }
-                          style={
-                            [styles.categoryImage, { resizeMode: "contain" }]
-                          }
+                          source={{ uri: item.image.url }}
+                          style={[styles.categoryImage, { resizeMode: "contain" }]}
                         />
                       </Pressable>
-
                     </View>
                   );
                 }}
@@ -519,183 +594,237 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
                 horizontal
                 keyExtractor={(item) => item?.id}
               />
-            </View>
+            )}
+          </View>
 
-            <View style={[{ width: "100%", marginVertical: 10 }, alignItemsCenter, justifyContentSpaceBetween, flexDirectionRow]}>
-              <Text style={[styles.text, { color: colors.blackColor }]}>{CATEGORIES}</Text>
-              <Pressable onPress={onPressShopAll}>
-                <Text style={{ color: "#717171", fontSize: style.fontSizeNormal.fontSize, fontWeight: style.fontWeightThin1x.fontWeight }} >{SHOW_ALL} </Text>
-              </Pressable>
-            </View>
-            <View style={[{ width: wp(100), height: "auto", marginTop: 5 }, flexDirectionRow]}>
-              <FlatList
-                data={shopifyCollection.slice(0, 8)}
-                renderItem={({ item, index }) => {
-                  const borderColor = borderColors[index % borderColors.length];
-                  return (
-                    <View style={[{ width: wp(24.5), height: hp(18) }, alignItemsCenter]}>
-                      <Pressable style={[styles.card, overflowHidden, alignJustifyCenter, { borderWidth: 1, borderColor: isDarkMode ? borderColor : borderColor }]} onPress={() => onPressCollection(item?.id, item?.title)}>
-                        <Image source={{ uri: item?.image?.url }} style={[styles.categoryImage, { resizeMode: "contain" }]} />
-                      </Pressable>
-                      <Text
-                        style={[
-                          styles.categoryName,
-                          textAlign,
-                          {
-                            lineHeight: lineHeights[item?.title] || 10,
-                            color: blackColor,
-                            paddingVertical: spacings.large,
-                            fontWeight: style.fontWeightBold.fontWeight,
-                            fontSize: style.fontSizeSmall.fontSize,
-                            color: colors.blackColor
-                          }
-                        ]}
-                        onTextLayout={handleTextLayout(item?.title)}>{item?.title}</Text>
-                    </View>)
-                }}
-                numColumns={4}
-                keyExtractor={(item) => item?.id}
-              />
-            </View>
-            <Text style={[styles.text, { color: colors.blackColor, marginVertical: 15 }]}>{BEST_SELLING}</Text>
-            <View style={[{ height: hp(30) }, alignJustifyCenter]}>
-              {bestDealProducts?.length > 0 ? <FlatList
-                data={bestDealProducts}
-                renderItem={({ item, index }) => {
-                  return (
-                    <Product
-                      product={item}
-                      onAddToCart={addToCartProduct}
-                      loading={addingToCart?.has(getVariant(item)?.id ?? '')}
-                      inventoryQuantity={bestDealInventoryQuantities[index]}
-                      option={bestDealoptions[index]}
-                      ids={bestDealProductVariantsIDS[index]}
-                      // width={wp(36)}
-                      onPress={() => {
-                        navigation.navigate('ProductDetails', {
-                          product: item,
-                          variant: getVariant(item),
-                          inventoryQuantity: bestDealInventoryQuantities[index],
-                          tags: bestDealTags[index],
-                          option: bestDealoptions[index],
-                          ids: bestDealProductVariantsIDS[index]
-                        });
-                      }}
-                    />
-                  );
-                }}
-                showsHorizontalScrollIndicator={false}
-                horizontal
-              /> :
-                <LoaderKit
-                  style={{ width: 50, height: 50 }}
-                  name={LOADER_NAME}
-                  color={colors.blackColor}
-                />
-              }
-            </View>
-
-            {/* best deal */}
-            <View style={[{ width: "100%", marginVertical: 15 }, alignItemsCenter, justifyContentSpaceBetween, flexDirectionRow]}>
-              <Text style={[styles.text, { color: colors.blackColor }]}>{BEST_DEALS}</Text>
-            </View>
-            <ScrollView
-              horizontal
-              contentContainerStyle={{
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-              showsHorizontalScrollIndicator={false}>
-              {productsBest?.map(item => (
-                <View key={item}>
-                  <TouchableOpacity style={{ marginRight: 12, overflow: "hidden", borderRadius: 10 }}>
-                    <Image source={{ uri: item.image }} style={{ width: 200, height: 200 }} />
-                  </TouchableOpacity>
+          {/* catagories */}
+          <View style={[{ width: "100%", marginVertical: 10 }, alignItemsCenter, justifyContentSpaceBetween, flexDirectionRow]}>
+            <Text style={[styles.text, { color: colors.blackColor }]}>{CATEGORIES}</Text>
+            <Pressable onPress={onPressShopAll}>
+              <Text style={{ color: "#717171", fontSize: style.fontSizeNormal.fontSize, fontWeight: style.fontWeightThin1x.fontWeight }} >{SHOW_ALL} </Text>
+            </Pressable>
+          </View>
+          {
+            catagory.length === 0 ? (
+              <SkeletonPlaceholder>
+                <View>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <View style={{ width: wp(20), height: wp(20), borderRadius: 50, margin: 10 }} />
+                    <View style={{ width: wp(20), height: wp(20), borderRadius: 50, margin: 10 }} />
+                    <View style={{ width: wp(20), height: wp(20), borderRadius: 50, margin: 10 }} />
+                    <View style={{ width: wp(20), height: wp(20), borderRadius: 50, margin: 10 }} />
+                  </View>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <View style={{ width: wp(20), height: wp(20), borderRadius: 50, margin: 10 }} />
+                    <View style={{ width: wp(20), height: wp(20), borderRadius: 50, margin: 10 }} />
+                    <View style={{ width: wp(20), height: wp(20), borderRadius: 50, margin: 10 }} />
+                    <View style={{ width: wp(20), height: wp(20), borderRadius: 50, margin: 10 }} />
+                  </View>
                 </View>
-              ))}
-            </ScrollView>
-
-            {/* our product */}
-            <View style={[{ width: "100%", marginVertical: 15 }, alignItemsCenter, justifyContentSpaceBetween, flexDirectionRow]}>
-              <Text style={[styles.text, { color: colors.blackColor }]}>{OUR_PRODUCT}</Text>
-              <Text style={{ color: "#717171", fontSize: style.fontSizeNormal.fontSize, fontWeight: style.fontWeightThin1x.fontWeight }} onPress={() => onPressCollection(ELECTRONIC_OUR_PRODUCT_COLLECTION_ID, OUR_PRODUCT)}>{SHOW_ALL}</Text>
-            </View>
-            <View style={[{ height: hp(30) }, alignJustifyCenter]}>
-              {products?.length > 0 ? <FlatList
-                data={products}
-                renderItem={({ item, index }) => {
-                  return (
-                    <Product
-                      product={item}
-                      onAddToCart={addToCartProduct}
-                      loading={addingToCart?.has(getVariant(item)?.id ?? '')}
-                      inventoryQuantity={inventoryQuantities[index]}
-                      option={options[index]}
-                      ids={productVariantsIDS[index]}
-                      // width={wp(36)}
-                      onPress={() => {
-                        navigation.navigate('ProductDetails', {
-                          product: item,
-                          variant: getVariant(item),
-                          inventoryQuantity: inventoryQuantities[index],
-                          tags: tags[index],
-                          option: options[index],
-                          ids: productVariantsIDS[index]
-                        });
-                      }}
-                    />
-                  );
-                }}
-                showsHorizontalScrollIndicator={false}
-                horizontal
-              /> :
-                <LoaderKit
-                  style={{ width: 50, height: 50 }}
-                  name={LOADER_NAME}
-                  color={blackColor}
+              </SkeletonPlaceholder>
+            ) : (
+              <View style={[{ width: wp(100), height: "auto", marginTop: 5 }, flexDirectionRow]}>
+                <FlatList
+                  data={shopifyCollection.slice(0, 8)}
+                  renderItem={({ item, index }) => {
+                    const borderColor = borderColors[index % borderColors.length];
+                    return (
+                      <View style={[{ width: wp(24.5), height: hp(18) }, alignItemsCenter]}>
+                        <Pressable
+                          style={[
+                            styles.card,
+                            overflowHidden,
+                            alignJustifyCenter,
+                            {
+                              borderWidth: 1,
+                              borderColor: isDarkMode ? borderColor : borderColor,
+                            },
+                          ]}
+                          onPress={() => onPressCollection(item?.id, item?.title)}
+                        >
+                          <Image
+                            source={{ uri: item?.image?.url }}
+                            style={[styles.categoryImage, { resizeMode: "contain" }]}
+                          />
+                        </Pressable>
+                        <Text
+                          style={[
+                            styles.categoryName,
+                            textAlign,
+                            {
+                              lineHeight: lineHeights[item?.title] || 10,
+                              color: blackColor,
+                              paddingVertical: spacings.large,
+                              fontWeight: style.fontWeightBold.fontWeight,
+                              fontSize: style.fontSizeSmall.fontSize,
+                              color: colors.blackColor,
+                            },
+                          ]}
+                          onTextLayout={handleTextLayout(item?.title)}
+                        >
+                          {item?.title}
+                        </Text>
+                      </View>
+                    );
+                  }}
+                  numColumns={4}
+                  keyExtractor={(item) => item?.id}
                 />
-              }
-            </View>
-            {/* <FastImage
-            source={{ uri: GIF.gif }}
-            style={[
-              { width: wp(100), height: hp(30), marginVertical: spacings.large },
-            ]}
-          /> */}
-            <Carousal
-              data={carouselData.slice(3, 5)}
-              dostsShow={true}
-              renderItem={item => (
-                <Image source={{ uri: item?.image }} style={[{ width: wp(91.5), height: hp(20) }, borderRadius10, resizeModeCover]} />
-              )}
-            />
-          </ScrollView>
-          <ChatButton onPress={handleChatButtonPress} />
-        </View>
+              </View>
+            )
+          }
 
-      </KeyboardAvoidingView>
-    </ImageBackground>
+
+          {/* BestSelling */}
+          <Text style={[styles.text, { color: colors.blackColor, marginVertical: 15 }]}>{BEST_SELLING}</Text>
+          <View style={[{ height: hp(30) }, alignJustifyCenter]}>
+            {bestDealProducts?.length > 0 ? <FlatList
+              data={bestDealProducts}
+              renderItem={({ item, index }) => {
+                return (
+                  <Product
+                    product={item}
+                    onAddToCart={addToCartProduct}
+                    loading={addingToCart?.has(getVariant(item)?.id ?? '')}
+                    inventoryQuantity={bestDealInventoryQuantities[index]}
+                    option={bestDealoptions[index]}
+                    ids={bestDealProductVariantsIDS[index]}
+                    spaceTop={4}
+                    onPress={() => {
+                      navigation.navigate('ProductDetails', {
+                        product: item,
+                        variant: getVariant(item),
+                        inventoryQuantity: bestDealInventoryQuantities[index],
+                        tags: bestDealTags[index],
+                        option: bestDealoptions[index],
+                        ids: bestDealProductVariantsIDS[index]
+                      });
+                    }}
+                  />
+                );
+              }}
+              showsHorizontalScrollIndicator={false}
+              horizontal
+            /> :
+              <SkeletonPlaceholder>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <View style={{ width: wp(43), height: hp(21), borderRadius: 10, marginRight: 10 }} />
+                  <View style={{ width: wp(43), height: hp(21), borderRadius: 10, marginRight: 10 }} />
+                  <View style={{ width: wp(43), height: hp(21), borderRadius: 10, marginRight: 10 }} />
+                  <View style={{ width: wp(43), height: hp(21), borderRadius: 10, marginRight: 10 }} />
+                </View>
+              </SkeletonPlaceholder>
+              // <LoaderKit
+              //   style={{ width: 50, height: 50 }}
+              //   name={LOADER_NAME}
+              //   color={blackColor}
+              // />
+            }
+          </View>
+
+          {/* BestDeals */}
+          <View style={[{ width: "100%", marginVertical: 15 }, alignItemsCenter, justifyContentSpaceBetween, flexDirectionRow]}>
+            <Text style={[styles.text, { color: colors.blackColor }]}>{BEST_DEALS}</Text>
+          </View>
+          <ScrollView
+            horizontal
+            contentContainerStyle={{
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+            showsHorizontalScrollIndicator={false}>
+            {productsBest?.map(item => (
+              <View key={item}>
+                <TouchableOpacity style={{ marginRight: 12, overflow: "hidden", borderRadius: 10 }}>
+                  <Image source={{ uri: item.image }} style={{ width: 200, height: 200 }} />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </ScrollView>
+
+          {/* ourProduct */}
+          <View style={[{ width: "100%", marginVertical: 15 }, alignItemsCenter, justifyContentSpaceBetween, flexDirectionRow]}>
+            <Text style={[styles.text, { color: colors.blackColor }]}>{OUR_PRODUCT}</Text>
+            <Text style={{ color: "#717171", fontSize: style.fontSizeNormal.fontSize, fontWeight: style.fontWeightThin1x.fontWeight }} onPress={() => onPressCollection(ELECTRONIC_OUR_PRODUCT_COLLECTION_ID, OUR_PRODUCT)}>{SHOW_ALL}</Text>
+          </View>
+          <View style={[{ height: hp(30) }, alignJustifyCenter]}>
+            {products?.length > 0 ? <FlatList
+              data={products}
+              renderItem={({ item, index }) => {
+                return (
+                  <Product
+                    product={item}
+                    onAddToCart={addToCartProduct}
+                    loading={addingToCart?.has(getVariant(item)?.id ?? '')}
+                    inventoryQuantity={inventoryQuantities[index]}
+                    option={options[index]}
+                    ids={productVariantsIDS[index]}
+                    spaceTop={4}
+                    onPress={() => {
+                      navigation.navigate('ProductDetails', {
+                        product: item,
+                        variant: getVariant(item),
+                        inventoryQuantity: inventoryQuantities[index],
+                        tags: tags[index],
+                        option: options[index],
+                        ids: productVariantsIDS[index]
+                      });
+                    }}
+                  />
+                );
+              }}
+              showsHorizontalScrollIndicator={false}
+              horizontal
+            /> :
+              <SkeletonPlaceholder>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <View style={{ width: wp(43), height: hp(21), borderRadius: 10, marginRight: 10 }} />
+                  <View style={{ width: wp(43), height: hp(21), borderRadius: 10, marginRight: 10 }} />
+                  <View style={{ width: wp(43), height: hp(21), borderRadius: 10, marginRight: 10 }} />
+                  <View style={{ width: wp(43), height: hp(21), borderRadius: 10, marginRight: 10 }} />
+                </View>
+              </SkeletonPlaceholder>
+              // <LoaderKit
+              //   style={{ width: 50, height: 50 }}
+              //   name={LOADER_NAME}
+              //   color={blackColor}
+              // />
+            }
+          </View>
+
+          {/* bannerCarousal */}
+          <Carousal
+            data={carouselData.slice(3, 5)}
+            dostsShow={true}
+            renderItem={item => (
+              <Image source={{ uri: item?.image }} style={[{ width: wp(95), height: hp(20) }, borderRadius10, resizeModeCover]} />
+            )}
+          />
+        </View>
+      </ScrollView>
+      <ChatButton onPress={handleChatButtonPress} />
+    </ImageBackground >
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: spacings.small
+    paddingHorizontal: spacings.medium
   },
   text: {
-    fontSize: style.fontSizeMedium1x.fontSize,
+    fontSize: style.fontSizeMedium.fontSize,
     fontWeight: style.fontWeightThin1x.fontWeight,
     color: blackColor,
-    fontFamily: 'GeneralSans-Variable'
+    // fontFamily: 'GeneralSans-Variable'
   },
   input: {
-    width: "93%",
+    width: "93.5%",
     height: hp(6),
     borderColor: 'transparent',
     borderWidth: .1,
     borderRadius: 5,
     paddingHorizontal: spacings.large,
-    marginVertical: spacings.large,
+    marginVertical: spacings.small,
     marginHorizontal: 16,
     shadowOffset: {
       width: 0,

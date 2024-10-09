@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image,  } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, } from 'react-native';
 import { redColor, blackColor, grayColor, whiteColor } from '../constants/Color'
 import Ionicons from 'react-native-vector-icons/dist/Ionicons';
 import AntDesign from 'react-native-vector-icons/dist/AntDesign';
 import { spacings, style } from '../constants/Fonts';
 import { BaseStyle } from '../constants/Style';
-import { MENU_ICON, SHOPPINGBUCKET_ICON,ICON_ADDCART,SHARE, SEARCH_ICON, WARLEY_HEADER_LOGO_NEW, WHITE_MENU_ICON, WHITE_SHOPPINGBUCKET_ICON, WHITE_SEARCH_ICON, NOTIFICTION_IMG } from '../assests/images'
+import { MENU_ICON, SHOPPINGBUCKET_ICON, ICON_ADDCART, SHARE, SEARCH_ICON, WARLEY_HEADER_LOGO_NEW, WHITE_MENU_ICON, WHITE_SHOPPINGBUCKET_ICON, WHITE_SEARCH_ICON, NOTIFICTION_IMG } from '../assests/images'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from '../utils';
 import { logEvent } from '@amplitude/analytics-react-native';
 import MenuModal from '../components/Modal/MenuModal';
@@ -13,7 +13,7 @@ import { useCart } from '../context/Cart';
 import { useThemes } from '../context/ThemeContext';
 import { lightColors, darkColors } from '../constants/Color';
 const { alignItemsCenter, alignJustifyCenter, flexDirectionRow, justifyContentSpaceBetween } = BaseStyle;
-const Header = ({ navigation, backIcon, text,share, onPress,productId, shareProduct, textinput, notification, image, closeIcon, menuImage, onClosePress, shoppingCart, onPressShopByCatagory }: { navigation: any, backIcon?: boolean, text?: string, textinput?: boolean, notification?: boolean }) => {
+const Header = ({ navigation, backIcon, text, share, onPress, productId, shareProduct, textinput, notification, image, closeIcon, menuImage, onClosePress, shoppingCart, onPressShopByCatagory }: { navigation: any, backIcon?: boolean, text?: string, textinput?: boolean, notification?: boolean }) => {
   const { totalQuantity } = useCart();
   const [modalVisible, setModalVisible] = useState(false)
   const { isDarkMode } = useThemes();
@@ -48,23 +48,23 @@ const Header = ({ navigation, backIcon, text,share, onPress,productId, shareProd
             <Ionicons name={"arrow-back"} size={30} color={colors.blackColor} />
           </TouchableOpacity>}
           {closeIcon && <TouchableOpacity style={[alignJustifyCenter, { width: wp(10) }]} onPress={OnClickClose}>
-            <Ionicons name={"close"} size={35} color={colors.blackColor} />
+            <Ionicons name={"close"} size={30} color={colors.blackColor} />
           </TouchableOpacity>}
-          {menuImage && <TouchableOpacity style={[alignJustifyCenter, { width: wp(10) }]} onPress={() => {setModalVisible(true), logEvent('Menu Button Clicked')}}>
+          {menuImage && <TouchableOpacity style={[alignJustifyCenter, { width: wp(10) }]} onPress={() => { setModalVisible(true), logEvent('Menu Button Clicked') }}>
             <Image source={isDarkMode ? WHITE_MENU_ICON : MENU_ICON} style={{ width: wp(6), height: hp(4), resizeMode: "contain", marginLeft: spacings.large }} />
           </TouchableOpacity>}
           {text && <Text style={[styles.text, { color: colors.blackColor }]}>{trimcateText(text)}</Text>}
         </View>
         {image && <Image source={isDarkMode ? WARLEY_HEADER_LOGO_NEW : WARLEY_HEADER_LOGO_NEW} style={{ width: wp(34), height: hp(4.5), resizeMode: "contain", marginLeft: spacings.Large1x }} />}
-        <View style={[flexDirectionRow, { width: "auto",marginRight:spacings.large }, justifyContentSpaceBetween, alignItemsCenter]}>
+        <View style={[flexDirectionRow, { width: "auto", marginRight: spacings.large }, justifyContentSpaceBetween, alignItemsCenter]}>
           {textinput && <TouchableOpacity style={[alignJustifyCenter, { width: wp(8) }]} onPress={OnClickSearchBar}>
             <Image source={isDarkMode ? WHITE_SEARCH_ICON : SEARCH_ICON} style={{ width: wp(6), height: hp(3.5), resizeMode: "contain", marginLeft: spacings.large }} />
           </TouchableOpacity>}
-          {share && <TouchableOpacity style={[alignJustifyCenter, { width: wp(8) }]} onPress={()=>shareProduct(productId)}>
-          <Image source={SHARE} style={{ width: wp(6), height: hp(3.5), resizeMode: "contain", marginLeft: spacings.large }} />
+          {share && <TouchableOpacity style={[alignJustifyCenter, { width: wp(8) }]} onPress={() => shareProduct(productId)}>
+            <Image source={SHARE} style={{ width: wp(6), height: hp(3.5), resizeMode: "contain", marginLeft: spacings.large }} />
           </TouchableOpacity>}
           {notification && <TouchableOpacity style={[alignJustifyCenter, { width: wp(5) }]} >
-            <Image source={isDarkMode ? NOTIFICTION_IMG : NOTIFICTION_IMG} style={{ width: wp(6), height: hp(3.3), resizeMode: "contain", marginLeft: spacings.large }} />
+            <Image source={isDarkMode ? NOTIFICTION_IMG : NOTIFICTION_IMG} style={{ width: wp(6), height: hp(3), resizeMode: "contain", marginLeft: spacings.large }} />
             {/* {totalQuantity > 0 && (
               <View style={styles.badgeContainer}>
                 <Text style={styles.badgeText}>{totalQuantity}</Text>
@@ -72,7 +72,7 @@ const Header = ({ navigation, backIcon, text,share, onPress,productId, shareProd
             )} */}
           </TouchableOpacity>}
           {shoppingCart && <TouchableOpacity style={[alignJustifyCenter, { width: wp(10) }]} onPress={OnClickCartIcon}>
-            <Image source={ICON_ADDCART} style={{ width: wp(6), height: hp(3.3), resizeMode: "contain", marginLeft: spacings.large }} />
+            <Image source={ICON_ADDCART} style={{ width: wp(6), height: hp(3), resizeMode: "contain", marginLeft: spacings.large }} />
             {totalQuantity > 0 && (
               <View style={styles.badgeContainer}>
                 <Text style={styles.badgeText}>{totalQuantity}</Text>

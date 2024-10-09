@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Pressable, ImageBackground } from 'react-native';
-import { blackColor, grayColor, whiteColor, redColor } from '../constants/Color'
+import { blackColor, grayColor, whiteColor, redColor } from '../constants/Color';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from '../utils';
 import {
   ADD_TO_CART, OUT_OF_STOCK, BEST_DEALS_OF_THE_WEEK, POPULAR_LIQUOR, BEER, CAN, NON_LOW_ALCOHOL, getAdminAccessToken, getStoreDomain,
   STOREFRONT_DOMAIN, ADMINAPI_ACCESS_TOKEN, LOADER_NAME
@@ -22,6 +23,7 @@ import { useThemes } from '../context/ThemeContext';
 import { lightColors, darkColors } from '../constants/Color';
 import ChatButton from '../components/ChatButton';
 import { scheduleNotification } from '../notifications';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 const { alignJustifyCenter, flexDirectionRow, flex, borderRadius10, overflowHidden, textAlign, borderWidth1, resizeModeContain } = BaseStyle;
 
 const SearchResultScreen: React.FC = ({ navigation }: { navigation: any }) => {
@@ -240,7 +242,19 @@ const SearchResultScreen: React.FC = ({ navigation }: { navigation: any }) => {
   return (
     <ImageBackground style={[flex, { backgroundColor: colors.whiteColor }]} source={isDarkMode ? '' : BACKGROUND_IMAGE}>
       <Header backIcon={true} text={route?.params?.title} navigation={navigation} />
-      <View style={[styles.container, flex]}>
+      <View style={{ width: wp(100), height: 5, backgroundColor: whiteColor }} />
+      <View style={[styles.container, flex, { marginTop: spacings.large }]}>
+        {loading &&
+          <SkeletonPlaceholder>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', flexWrap: "wrap" }}>
+              <View style={{ width: wp(47), height: hp(28), borderRadius: 10, marginVertical: 5 }} />
+              <View style={{ width: wp(47), height: hp(28), borderRadius: 10, marginVertical: 5 }} />
+              <View style={{ width: wp(47), height: hp(28), borderRadius: 10, marginVertical: 5 }} />
+              <View style={{ width: wp(47), height: hp(28), borderRadius: 10, marginVertical: 5 }} />
+              <View style={{ width: wp(47), height: hp(28), borderRadius: 10, marginVertical: 5 }} />
+              <View style={{ width: wp(47), height: hp(28), borderRadius: 10, marginVertical: 5 }} />
+            </View>
+          </SkeletonPlaceholder>}
         {(title === BEST_DEALS_OF_THE_WEEK || title === POPULAR_LIQUOR) &&
           <FlatList
             data={products}
@@ -260,7 +274,7 @@ const SearchResultScreen: React.FC = ({ navigation }: { navigation: any }) => {
             showsVerticalScrollIndicator={false}
           />
         }
-        {loading && <LoadingModal visible={loading} text={"Please wait while we load the products."} />}
+        {/* {loading && <LoadingModal visible={loading} text={"Please wait while we load the products."} />} */}
         <ChatButton onPress={handleChatButtonPress} />
       </View>
     </ImageBackground>

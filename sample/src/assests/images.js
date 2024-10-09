@@ -51,5 +51,6 @@ export const NOTIFICTION_IMG =require('./warley/notification.png')
 export const ADD_TO_CART_IMG =require('./warley/AddToCart.png')
 
 export const ICON_ADDCART =require('./warley/addToCart_icon.png')
-export const SHARE =require('./warley/share.png')
+export const SHARE =require('./warley/share.png');
+export const BANNER_IMAGE =require('./warley/Banner.png')
 

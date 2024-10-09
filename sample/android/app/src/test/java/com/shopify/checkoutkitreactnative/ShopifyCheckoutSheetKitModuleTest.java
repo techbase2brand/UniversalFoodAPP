@@ -1,4 +1,4 @@
-package com.Warley;
+package com.UniversalFood;
 
 import androidx.activity.ComponentActivity;
 
@@ -8,8 +8,8 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.shopify.checkoutsheetkit.ShopifyCheckoutSheetKit;
 import com.shopify.checkoutsheetkit.pixelevents.*;
 import com.shopify.checkoutsheetkit.lifecycleevents.*;
-import com.Warley.checkoutsheetkit.ShopifyCheckoutSheetKitModule;
-import com.Warley.checkoutsheetkit.CustomCheckoutEventProcessor;
+import com.UniversalFood.checkoutsheetkit.ShopifyCheckoutSheetKitModule;
+import com.UniversalFood.checkoutsheetkit.CustomCheckoutEventProcessor;
 
 import org.junit.Before;
 import org.junit.Test;

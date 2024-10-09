@@ -103,7 +103,7 @@ const ProductVertical = ({ product, onAddToCart, inventoryQuantity, loading, onP
   return (
     <Pressable style={[styles.productContainer, {
       width: width ? width : wp(43), height: height ? height : wp(51), backgroundColor: isDarkMode ? grayColor : whiteColor,
-      marginVertical: isDarkMode ? spacings.xxsmall : spaceTop, marginHorizontal: spaceTop ? 0 : 5,marginVertical:  5, borderRadius: 10
+      marginVertical: isDarkMode ? spacings.xxsmall : spaceTop, marginHorizontal: spaceTop ? 0 : 5, marginVertical: 5, borderRadius: 10
     }]} onPress={onPress}>
       <View style={{ width: "100%", marginBottom: spacings.small, borderRadius: 10 }}>
         {/* <TouchableOpacity style={[positionAbsolute, alignJustifyCenter, styles.eyeButton]} onPress={showQuickViewModal}>
@@ -130,7 +130,7 @@ const ProductVertical = ({ product, onAddToCart, inventoryQuantity, loading, onP
               />
             </TouchableOpacity>
           </View>
-          <Text style={{ paddingLeft: spacings.medium,color: colors.blackColor }}>
+          <Text style={{ paddingLeft: spacings.medium, color: colors.grayColor }}>
             1 packet
           </Text>
           <View style={{ flexDirection: "row", justifyContent: "space-between" }}>

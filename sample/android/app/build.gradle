@@ -88,15 +88,15 @@ android {
     }
   }
 
-  namespace "com.Warley"
+  namespace "com.UniversalFood"
   defaultConfig {
-    applicationId "com.Warley"
+    applicationId "com.UniversalFood"
     minSdkVersion rootProject.ext.minSdkVersion
     targetSdkVersion rootProject.ext.targetSdkVersion
     versionCode 11
     versionName "1.6"
     // manifestPlaceholders = [
-    //     appAuthRedirectScheme: "com.Warley" // Replace with your actual redirect scheme
+    //     appAuthRedirectScheme: "com.UniversalFood" // Replace with your actual redirect scheme
     // ]
   }
   signingConfigs {
@@ -107,9 +107,9 @@ android {
       keyPassword 'android'
     }
      release {
-      storeFile file('lovedrink.keystore')
+      storeFile file('UniversalFood.keystore')
       storePassword '12345678'
-      keyAlias 'lovedrink_key_alias'
+      keyAlias 'UniversalFood_key_alias'
       keyPassword '12345678'
     }
   }

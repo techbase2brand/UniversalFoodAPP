@@ -1,4 +1,4 @@
-package com.Warley
+package com.UniversalFood
 
 import android.app.Application
 import com.facebook.react.PackageList

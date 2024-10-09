@@ -23,6 +23,7 @@ import { useThemes } from '../context/ThemeContext';
 import { lightColors, darkColors } from '../constants/Color';
 import ChatButton from '../components/ChatButton';
 import { scheduleNotification } from '../notifications';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
 const { flex, textAlign, alignItemsCenter, resizeModeContain, borderRadius10, positionRelative, alignJustifyCenter, resizeModeCover, flexDirectionRow } = BaseStyle;
 type Props = NativeStackScreenProps<RootStackParamList, 'CatalogScreen'>;
 
@@ -260,10 +261,10 @@ function CatalogScreen({ navigation }: Props) {
           </View>
         </TouchableOpacity>
         <View style={[styles.productCollectionBox]}>
-          <FlatList
+          {shopifyCollection.length != 0 ? <FlatList
             data={shopifyCollection}
             renderItem={({ item }) => (
-              <Pressable onPress={() => onPressCollection(item?.id, item?.title)} style={{ padding: spacings.large, backgroundColor: selectedCollectionId === item?.id ? themecolors.lightPink : themecolors.whiteColor, borderWidth: 1, borderRadius: 10, marginHorizontal: 5, flexDirection: "row",borderColor:themecolors.grayColor }}>
+              <Pressable onPress={() => onPressCollection(item?.id, item?.title)} style={{ padding: spacings.large, backgroundColor: selectedCollectionId === item?.id ? themecolors.lightPink : themecolors.whiteColor, borderWidth: 1, borderRadius: 10, marginHorizontal: 5, flexDirection: "row", borderColor: themecolors.grayColor }}>
                 <Image source={{ uri: item?.image?.url }} style={[resizeModeContain, { width: 25, height: 25 }]} />
                 <Text style={[styles.categoryName, textAlign, { color: themecolors.blackColor }]}>{item?.title}</Text>
               </Pressable>
@@ -271,7 +272,15 @@ function CatalogScreen({ navigation }: Props) {
             showsHorizontalScrollIndicator={false}
             keyExtractor={(index) => index.toString()}
             horizontal
-          />
+          /> :
+            <SkeletonPlaceholder>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
+                <View style={{ width: wp(30), height: hp(5), borderRadius: 10, marginHorizontal: 5 }} />
+                <View style={{ width: wp(30), height: hp(5), borderRadius: 10, marginHorizontal: 5 }} />
+                <View style={{ width: wp(30), height: hp(5), borderRadius: 10, marginHorizontal: 5 }} />
+              </View>
+            </SkeletonPlaceholder>
+          }
         </View>
         <View style={[styles.productDetailsBox, { paddingBottom: isDarkMode ? spacings.xLarge : 0 }, alignJustifyCenter]}>
           {!loading ? <>
@@ -310,11 +319,21 @@ function CatalogScreen({ navigation }: Props) {
           </>
             :
             <View style={[alignJustifyCenter, { height: hp(52) }]}>
-              <LoaderKit
+              {/* <LoaderKit
                 style={{ width: 50, height: 50 }}
                 name={LOADER_NAME}
                 color={themecolors.blackColor}
-              />
+              /> */}
+              <SkeletonPlaceholder>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', flexWrap: "wrap" }}>
+                  <View style={{ width: wp(47), height: hp(23), borderRadius: 10, marginVertical: 5 }} />
+                  <View style={{ width: wp(47), height: hp(23), borderRadius: 10, marginVertical: 5 }} />
+                  <View style={{ width: wp(47), height: hp(23), borderRadius: 10, marginVertical: 5 }} />
+                  <View style={{ width: wp(47), height: hp(23), borderRadius: 10, marginVertical: 5 }} />
+                  <View style={{ width: wp(47), height: hp(23), borderRadius: 10, marginVertical: 5 }} />
+                  <View style={{ width: wp(47), height: hp(23), borderRadius: 10, marginVertical: 5 }} />
+                </View>
+              </SkeletonPlaceholder>
             </View>
           }
         </View>

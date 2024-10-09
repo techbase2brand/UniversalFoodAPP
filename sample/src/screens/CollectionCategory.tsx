@@ -24,6 +24,8 @@ import { useThemes } from '../context/ThemeContext';
 import { lightColors, darkColors } from '../constants/Color';
 import ChatButton from '../components/ChatButton';
 import { scheduleNotification } from '../notifications';
+import SkeletonPlaceholder from 'react-native-skeleton-placeholder';
+
 const { alignItemsCenter, resizeModeContain, textAlign, alignJustifyCenter, flex, borderRadius10, overflowHidden, borderWidth1, flexDirectionRow, justifyContentSpaceBetween } = BaseStyle;
 
 const CollectionCategory = ({ navigation }: { navigation: any }) => {
@@ -201,6 +203,15 @@ const CollectionCategory = ({ navigation }: { navigation: any }) => {
             <Image source={isDarkMode ? WHITE_FILTER_ICON : FILTER_ICON} style={[{ width: 25, height: 25 }, resizeModeContain]} />
           </TouchableOpacity>
         </View>
+        {/* {loading && <SkeletonPlaceholder>
+          <ScrollView style={[{ width: wp(90), height: hp(0) }, alignJustifyCenter]}>
+            <View style={{ width: "100%", height: hp(16), borderRadius: 10, margin: 10 }} />
+            <View style={{ width: "100%", height: hp(16), borderRadius: 10, margin: 10 }} />
+            <View style={{ width: "100%", height: hp(16), borderRadius: 10, margin: 10 }} />
+            <View style={{ width: "100%", height: hp(16), borderRadius: 10, margin: 10 }} />
+            <View style={{ width: "100%", height: hp(16), borderRadius: 10, margin: 10 }} />
+          </ScrollView>
+        </SkeletonPlaceholder>} */}
         {route?.params?.from ?
           <View style={[styles.productDetailBox]}>
             {products?.length > 0 ?
@@ -228,6 +239,14 @@ const CollectionCategory = ({ navigation }: { navigation: any }) => {
                   color={colors.blackColor}
                 />
               </View>
+              // <SkeletonPlaceholder>
+              //   <View >
+              //     <View style={{ width: wp(46), height: hp(14), borderRadius: 10, marginRight: 10 }} />
+              //     <View style={{ width: wp(46), height: hp(14), borderRadius: 10, marginRight: 10 }} />
+              //     <View style={{ width: wp(46), height: hp(14), borderRadius: 10, marginRight: 10 }} />
+              //     <View style={{ width: wp(46), height: hp(14), borderRadius: 10, marginRight: 10 }} />
+              //   </View>
+              // </SkeletonPlaceholder>
             }
           </View>
           : <ScrollView showsVerticalScrollIndicator={false} style={{ marginBottom: 110 }}>
@@ -267,6 +286,7 @@ const CollectionCategory = ({ navigation }: { navigation: any }) => {
       />
 
       {loading && <LoadingModal visible={loading} text={"Please wait while we load the products."} />}
+
 
     </ImageBackground>
   );

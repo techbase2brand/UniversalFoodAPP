@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { ScrollView, View, StyleSheet, Text, Image, Pressable, ActivityIndicator, TouchableOpacity, FlatList, Alert, ImageBackground, Linking } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { ScrollView, View, StyleSheet, Text, Image, Pressable, ActivityIndicator, TouchableOpacity, FlatList, Alert, ImageBackground, Animated } from 'react-native';
 import { Colors, useTheme } from '../context/Theme';
 import { useCart } from '../context/Cart';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -31,6 +31,7 @@ import { lightColors, darkColors } from '../constants/Color';
 import ChatButton from '../components/ChatButton';
 import { useNavigation } from '@react-navigation/native';
 import { scheduleNotification } from '../notifications';
+import LoginModal from '../components/Modal/LoginModal'
 const { alignJustifyCenter, flexDirectionRow, resizeModeCover, justifyContentSpaceBetween, borderRadius10, borderRadius5, textAlign, positionAbsolute,
   alignItemsCenter, resizeModeContain, textDecorationUnderline } = BaseStyle;
 
@@ -150,7 +151,7 @@ function ProductDetailsScreen({ navigation, route }: Props) {
         link: `https://warley.page.link/XktS?productId=${id}`,
         domainUriPrefix: 'https://warley.page.link',
         android: {
-          packageName: 'com.Warley',
+          packageName: 'com.UniversalFood',
         },
 
       }, dynamicLinks.ShortLinkType.DEFAULT)
@@ -279,6 +280,8 @@ function ProductDetails({
   const [option, setOptions] = useState([]);
   const [productVariantsIDS, setProductVariantsIDS] = useState([]);
   const [products, setProducts] = useState([]);
+  const [loginModalVisible, setLoginModalVisible] = useState(false);
+  const slideAnim = useRef(new Animated.Value(500)).current;
 
   useEffect(() => {
     // Check if no option is selected
@@ -371,7 +374,7 @@ function ProductDetails({
   //       link: `https://appcatify.page.link/ezHe?productId=${id}`,
   //       domainUriPrefix: 'https://appcatify.page.link',
   //       android: {
-  //         packageName: 'com.Warley',
+  //         packageName: 'com.UniversalFood',
   //       },
 
   //     }, dynamicLinks.ShortLinkType.DEFAULT)
@@ -599,7 +602,8 @@ function ProductDetails({
     logEvent('Click CheckOut ');
     if (!userLoggedIn) {
       logEvent('user not login Go to Auth');
-      navigation.navigate("AuthStack");
+      openModal()
+      // navigation.navigate("AuthStack");
       Toast.show("Please First complete the registration process")
     } else {
       if (checkoutURL) {
@@ -614,6 +618,26 @@ function ProductDetails({
         console.log('Checkout URL is not available');
       }
     }
+  };
+
+  const openModal = () => {
+    setLoginModalVisible(true);
+    // Animate from bottom to top
+    Animated.timing(slideAnim, {
+      toValue: 0, // Slide to the top
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeModal = () => {
+    Animated.timing(slideAnim, {
+      toValue: 720, // Slide back to bottom
+      duration: 500,
+      useNativeDriver: true,
+    }).start(() => {
+      setLoginModalVisible(false);
+    });
   };
   return (
     <View>
@@ -896,7 +920,7 @@ function ProductDetails({
           {shareProductloading && <LoadingModal visible={shareProductloading} />}
         </View>
       </ScrollView>
-      <ChatButton onPress={handleChatButtonPress} bottom={80} />
+      <ChatButton onPress={handleChatButtonPress} bottom={100} />
       <View style={[flexDirectionRow, positionAbsolute, justifyContentSpaceBetween, { alignItems: "baseline", bottom: 3, width: wp(100), zIndex: 1, backgroundColor: themecolors.whiteColor, height: hp(10) }]}>
         <View style={{ width: wp(40) }}>
           <View style={[styles.quantityContainer, alignJustifyCenter, { width: wp(50) }]}>
@@ -942,6 +966,8 @@ function ProductDetails({
           )}
         </View>
       </View>
+      {loginModalVisible && (
+        <LoginModal modalVisible={loginModalVisible} closeModal={closeModal} slideAnim={slideAnim} />)}
     </View>
   );
 }
@@ -1153,7 +1179,7 @@ function createStyles(colors: Colors) {
       fontSize: style.fontSizeMedium1x.fontSize,
       fontWeight: style.fontWeightThin1x.fontWeight,
       color: blackColor,
-      fontFamily: 'GeneralSans-Variable'
+      // fontFamily: 'GeneralSans-Variable'
     },
   });
 }
