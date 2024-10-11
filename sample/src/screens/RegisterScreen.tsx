@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, ActivityIndicator, ImageBackground, Pressable } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, ActivityIndicator, ImageBackground, Pressable, Alert } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp, } from '../utils';
 import { spacings, style } from '../constants/Fonts';
 import { BaseStyle } from '../constants/Style';
@@ -27,11 +27,13 @@ import { loginSuccess } from '../redux/actions/authActions';
 import { useThemes } from '../context/ThemeContext';
 import { lightColors, darkColors } from '../constants/Color';
 import { useNavigation } from '@react-navigation/native';
+import { AuthContext } from '../context/AuthProvider';
 const { flex, alignJustifyCenter, alignItemsCenter, borderWidth1, borderRadius5, resizeModeContain, flexDirectionRow, positionAbsolute, textAlign, textDecorationUnderline } = BaseStyle;
 
-const RegisterScreen = ({ onBackToLogin }) => {
+const RegisterScreen = ({ onBackToLogin, onCloseModal }) => {
   const navigation = useNavigation();
   const { isDarkMode } = useThemes();
+  const { setIsLoggedIn } = useContext(AuthContext)
   const colors = isDarkMode ? darkColors : lightColors;
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -71,6 +73,18 @@ const RegisterScreen = ({ onBackToLogin }) => {
     //   setError(PLEASE_FILL_ALL_FIELD);
     //   return;
     // }
+    if (!firstName) {
+      Alert.alert("Please Enter Your First Name")
+      return;
+    }
+    if (!lastName) {
+      Alert.alert("Please Enter Your Last Name")
+      return;
+    }
+    if (!phone) {
+      Alert.alert("Please Enter Your Phone Number")
+      return;
+    }
     if (!emailPattern.test(email)) {
       setEmailError(INVALID_EMAIL_FORMAT);
       return;
@@ -86,7 +100,8 @@ const RegisterScreen = ({ onBackToLogin }) => {
     setShowOTP(true)
     try {
       const formattedPhoneNumber = `+91${phone}`;
-      const confirmation = await auth().signInWithPhoneNumber(formattedPhoneNumber);
+      console.log(formattedPhoneNumber)
+      await auth().signInWithPhoneNumber(formattedPhoneNumber);
     } catch (error) {
       console.error('Error sending OTP:', error);
     }
@@ -97,7 +112,7 @@ const RegisterScreen = ({ onBackToLogin }) => {
     logEvent('Sign up Button clicked');
     try {
       setLoading(true)
-      const response = await fetch('https://admin.appcartify.com:8444/api/customers', {
+      const response = await fetch('https://whale-app-nuspa.ondigitalocean.app/api/customers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -130,7 +145,11 @@ const RegisterScreen = ({ onBackToLogin }) => {
       await AsyncStorage.setItem('userDetails', JSON.stringify(responseData))
       Toast.show(`User Registered Succesfully`);
       setSuccessModalVisible(false)
-      navigation.navigate('Home');
+      setIsLoggedIn(true)
+      // onBackToLogin();
+      onCloseModal();
+      navigation.navigate('Cart');
+
       dispatch(loginSuccess({ email, password }));
       logEvent('User Registered Succesfully');
       handleNotificationTrigger()
@@ -371,7 +390,7 @@ const RegisterScreen = ({ onBackToLogin }) => {
                 <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{FIRST_NAME}</Text>
                 <View style={[styles.halfInput, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: colors.grayColor }]}>
                   <View>
-                    <Ionicons name={"person-sharp"} size={20} color={blackColor} />
+                    <Ionicons name={"person-sharp"} size={20} color={colors.grayColor} />
                   </View>
                   <View style={{ flex: 1 }}>
                     <TextInput
@@ -388,7 +407,7 @@ const RegisterScreen = ({ onBackToLogin }) => {
                 <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{LAST_NAME}</Text>
                 <View style={[styles.halfInput, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: colors.grayColor }]}>
                   <View>
-                    <Ionicons name={"person-sharp"} size={20} color={blackColor} />
+                    {/* <Ionicons name={"person-sharp"} size={20} color={colors.grayColor} /> */}
                   </View>
                   <View style={{ flex: 1 }}>
                     <TextInput
@@ -405,7 +424,7 @@ const RegisterScreen = ({ onBackToLogin }) => {
             <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{"Phone Number"}</Text>
             <View style={[styles.input, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: colors.grayColor }]}>
               <View>
-                <MaterialCommunityIcons name={"phone"} size={20} color={blackColor} />
+                <MaterialCommunityIcons name={"phone"} size={20} color={colors.grayColor} />
               </View>
               <View style={{ flex: 1 }}>
                 <TextInput
@@ -422,7 +441,7 @@ const RegisterScreen = ({ onBackToLogin }) => {
             <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{EMAIL}</Text>
             <View style={[styles.input, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: colors.grayColor }]}>
               <View>
-                <MaterialCommunityIcons name={"email-outline"} size={20} color={emailError ? redColor : blackColor} />
+                <MaterialCommunityIcons name={"email-outline"} size={20} color={emailError ? redColor : colors.grayColor} />
               </View>
               <View style={{ flex: 1 }}>
                 <TextInput
@@ -442,7 +461,7 @@ const RegisterScreen = ({ onBackToLogin }) => {
                 <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{PASSWORD}</Text>
                 <View style={[styles.halfInput, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: colors.grayColor }]}>
                   <View>
-                    <MaterialCommunityIcons name={"lock"} size={20} color={passwordError ? redColor : blackColor} />
+                    <MaterialCommunityIcons name={"lock"} size={20} color={passwordError ? redColor : colors.grayColor} />
                   </View>
                   <View style={{ flex: 1 }}>
                     <TextInput
@@ -463,7 +482,7 @@ const RegisterScreen = ({ onBackToLogin }) => {
                 <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{CONFIRM_PASSWORD}</Text>
                 <View style={[styles.halfInput, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: colors.grayColor }]}>
                   <View >
-                    <MaterialCommunityIcons name={"lock"} size={20} color={confirmPasswordError ? redColor : blackColor} />
+                    <MaterialCommunityIcons name={"lock"} size={20} color={confirmPasswordError ? redColor : colors.grayColor} />
                   </View>
                   <View style={{ flex: 1 }}>
                     <TextInput
@@ -482,7 +501,7 @@ const RegisterScreen = ({ onBackToLogin }) => {
               </View>
             </View>
             {confirmPasswordError || error || passwordError ? <Text style={styles.errorText}>{confirmPasswordError || error || passwordError}</Text> : null}
-            <Pressable style={[styles.button, alignItemsCenter, borderRadius5]} onPress={handleSendOtp}>
+            <Pressable style={[styles.button, alignItemsCenter, borderRadius5]} onPress={handleSignUp}>
               <Text style={styles.buttonText}>{"Register"}</Text>
             </Pressable>
 

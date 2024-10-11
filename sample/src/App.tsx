@@ -649,6 +649,7 @@ function CartIcon() {
   );
 }
 function AppWithNavigation({ route }: { route: any }) {
+  const { totalQuantity } = useCart();
   const { isDarkMode } = useThemes();
   const colors = isDarkMode ? darkColors : lightColors;
   const { isLoggedIn } = useContext(AuthContext)
@@ -670,7 +671,7 @@ function AppWithNavigation({ route }: { route: any }) {
         component={isLoggedIn || userLoggedIn ? HomeStack : HomeWithAuthStack}
         options={({ route }) => {
           const routeName = getFocusedRouteNameFromRoute(route);
-          console.log(routeName)
+          console.log("routeName",routeName)
           return {
             headerShown: false,
             tabBarStyle: { display: routeName === 'Search' || routeName === "AuthStack" || routeName === 'CartModal' || routeName === 'ShopifyCheckOut' ? 'none' : 'flex', backgroundColor: colors.whiteColor },
@@ -775,14 +776,34 @@ function AppWithNavigation({ route }: { route: any }) {
         name="Cart"
         component={CartStack}
         options={{
-          tabBarStyle: { display: isLoggedIn || userLoggedIn ? 'flex' : 'none', backgroundColor: colors.whiteColor },
+          tabBarStyle: { display: 'none', backgroundColor: colors.whiteColor },
           headerShown: false,
           tabBarIcon: ({ focused }) => (
             <View style={{ alignItems: "center", justifyContent: "center" }}>
               <View style={{ height: 10, width: 50, alignItems: "center", justifyContent: "center" }}>
+                {/* {totalQuantity > 0 && (
+                  <View style={{
+                    position: 'absolute',
+                    top: 4,
+                    right: 10,
+                    backgroundColor: redColor,
+                    borderRadius: wp(2),
+                    width: wp(4),
+                    height: wp(4),
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 9999
+                  }}>
+                    <Text style={{
+                      color: whiteColor,
+                      fontSize: wp(2.5),
+                      fontWeight: 'bold',
+                    }}>{totalQuantity}</Text>
+                  </View>
+                )} */}
                 {focused && (
                   <Image
-                    source={ICON_ADDCART}
+                    source={SELECTEDBAR_ICON}
                     style={{ position: 'absolute', top: 1, width: 50, height: 8, tintColor: redColor, resizeMode: "contain" }}
                   />
                 )}

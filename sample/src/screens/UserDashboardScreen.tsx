@@ -24,6 +24,8 @@ import { lightColors, darkColors } from '../constants/Color';
 import AddReviewModal from '../components/Modal/AddReviewModal';
 import ChatButton from '../components/ChatButton';
 import { scheduleNotification } from '../notifications';
+import Product from '../components/ProductVertical';
+import { ShopifyProduct } from '../../@types';
 const { alignJustifyCenter, textAlign, positionAbsolute, resizeModeContain, flexDirectionRow, flex, borderRadius10, alignItemsCenter, borderRadius5 } = BaseStyle;
 
 const UserDashboardScreen = () => {
@@ -159,9 +161,18 @@ const UserDashboardScreen = () => {
   const trimcateText = (text) => {
     const words = text.split(' ');
     if (words.length > 1) {
-      return words.slice(0, 1).join(' ') + '...';
+      return words.slice(0, 3).join(' ') + '...';
     }
     return text;
+  };
+  const getVariant = (product: ShopifyProduct) => {
+    if (product?.variants?.edges?.length > 0) {
+      return product?.variants?.edges[0]?.node;
+    } else if (product?.variants?.nodes?.length > 0) {
+      return product?.variants?.nodes[0];
+    } else {
+      return null;
+    }
   };
   return (
     <KeyboardAvoidingView
@@ -265,7 +276,7 @@ const UserDashboardScreen = () => {
           route.params?.from === "Saved" &&
           (wishList && wishList.length > 0 ?
             <>
-              <View style={{ width: wp(100), height: 5, backgroundColor: whiteColor }} />
+              <View style={{ width: wp(100), height: 5, backgroundColor: colors.whiteColor }} />
               <View style={[styles.detailsBox]}>
                 <FlatList
                   data={wishList}
@@ -278,7 +289,16 @@ const UserDashboardScreen = () => {
                     const inventoryQuantity = item?.variants?.nodes ? item?.variants?.nodes[0]?.inventoryQuantity : (item?.variants?.[0]?.inventory_quantity ? item?.variants?.[0]?.inventory_quantity : (Array.isArray(item?.inventoryQuantity) ? item?.inventoryQuantity[0] : item?.inventoryQuantity));
                     const variantId = item?.variants?.edges ? item?.variants.edges[0]?.node.id : item?.variants?.nodes ? item?.variants?.nodes[0]?.id : item?.variants?.[0]?.admin_graphql_api_id ? item?.variants[0]?.admin_graphql_api_id : item.variantId[0];
                     return (
-                      <View style={[styles.itemContainer, { backgroundColor: isDarkMode ? grayColor : whiteColor }]}>
+                      <Pressable style={[styles.itemContainer, { backgroundColor: isDarkMode ? grayColor : whiteColor }]} onPress={() => {
+                        navigation.navigate('ProductDetails', {
+                          product: item,
+                          variant: getVariant(item),
+                          inventoryQuantity: inventoryQuantity,
+                          // tags: bestDealTags[index],
+                          // option: bestDealoptions[index],
+                          // ids: bestDealProductVariantsIDS[index]
+                        });
+                      }}>
                         <Pressable style={[positionAbsolute, styles.favButton]} onPress={() => handlePress(item)}>
                           <AntDesign
                             name={"heart"}
@@ -299,9 +319,9 @@ const UserDashboardScreen = () => {
                             </View>
                             <View style={[{ flexDirection: "row", justifyContent: "space-between" }]}>
                               {inventoryQuantity <= 0 ? <Pressable
-                                style={[styles.addtocartButton, borderRadius10, alignJustifyCenter]}
+                                style={[styles.addtocartButton, borderRadius10, alignJustifyCenter, { backgroundColor: "transparent" }]}
                               >
-                                <Text style={styles.addToCartButtonText}>Out of stock</Text>
+                                <Text style={[styles.addToCartButtonText, { color: redColor }]}>Out of stock</Text>
                               </Pressable>
                                 : <Pressable
                                   // style={[styles.addtocartButton]}
@@ -332,7 +352,26 @@ const UserDashboardScreen = () => {
                               <Text style={styles.addToCartButtonText}>Add To Cart</Text>}
                           </Pressable>}
                       </View> */}
-                      </View>
+                      </Pressable>
+                      // <Product
+                      //   product={item}
+                      //   onAddToCart={addToCartProduct}
+                      //   loading={addingToCart?.has(getVariant(item)?.id ?? '')}
+                      //   inventoryQuantity={inventoryQuantity}
+                      //   // option={bestDealoptions[index]}
+                      //   // ids={bestDealProductVariantsIDS[index]}
+                      //   spaceTop={4}
+                      //   onPress={() => {
+                      //     navigation.navigate('ProductDetails', {
+                      //       product: item,
+                      //       variant: getVariant(item),
+                      //       inventoryQuantity: inventoryQuantity,
+                      //       // tags: bestDealTags[index],
+                      //       // option: bestDealoptions[index],
+                      //       // ids: bestDealProductVariantsIDS[index]
+                      //     });
+                      //   }}
+                      // />
 
                     );
                   }}
@@ -340,7 +379,7 @@ const UserDashboardScreen = () => {
               </View>
             </> :
             <>
-              <View style={{ width: wp(100), height: 5, backgroundColor: whiteColor }} />
+              <View style={{ width: wp(100), height: 5, backgroundColor: colors.whiteColor }} />
               <View style={[styles.centeredContainer, alignJustifyCenter, { width: wp(80), alignSelf: "center" }]}>
                 <View>
                   <AntDesign

@@ -92,10 +92,9 @@ const ProductVertical = ({ product, onAddToCart, inventoryQuantity, loading, onP
     setShowQuantity(true);
   };
 
-  const trimcateText = (text) => {
-    const words = text.split(' ');
-    if (words.length > 1) {
-      return words.slice(0, 2).join(' ') + '...';
+  const trimcateText = (text, maxLength = 15) => {
+    if (text.length > maxLength) {
+      return text.substring(0, maxLength) + '...';
     }
     return text;
   };
@@ -103,7 +102,7 @@ const ProductVertical = ({ product, onAddToCart, inventoryQuantity, loading, onP
   return (
     <Pressable style={[styles.productContainer, {
       width: width ? width : wp(43), height: height ? height : wp(51), backgroundColor: isDarkMode ? grayColor : whiteColor,
-      marginVertical: isDarkMode ? spacings.xxsmall : spaceTop, marginHorizontal: spaceTop ? 0 : 5, marginVertical: 5, borderRadius: 10
+      marginVertical: isDarkMode ? spacings.normalx : spaceTop, marginHorizontal: spaceTop ? 0 : 5, borderRadius: 10, overflow: "hidden"
     }]} onPress={onPress}>
       <View style={{ width: "100%", marginBottom: spacings.small, borderRadius: 10 }}>
         {/* <TouchableOpacity style={[positionAbsolute, alignJustifyCenter, styles.eyeButton]} onPress={showQuickViewModal}>
@@ -119,30 +118,30 @@ const ProductVertical = ({ product, onAddToCart, inventoryQuantity, loading, onP
         />
       </View>
       <View style={[styles.contentBox]}>
-        <View style={[{ width: "100%", height: hp(8), alignSelf: "center" }]}>
+        <View style={[{ width: width ? width : wp(43), height: hp(10), alignSelf: "center" }]}>
           <View style={{ width: "100%", flexDirection: "row", paddingHorizontal: 5 }}>
             <Text style={[styles.productName, { paddingRight: spacings.small, color: colors.blackColor }]}>{trimcateText(product?.title)}</Text>
             <TouchableOpacity style={[positionAbsolute, alignJustifyCenter, styles.favButton]} onPress={handlePress}>
               <AntDesign
                 name={isSelected ? "heart" : "hearto"}
                 size={18}
-                color={isSelected ? redColor : "#868889"}
+                color={isSelected ? redColor : colors.grayColor}
               />
             </TouchableOpacity>
           </View>
-          <Text style={{ paddingLeft: spacings.medium, color: colors.grayColor }}>
+          <Text style={{ paddingLeft: spacings.medium, color: colors.grayColor, fontSize: style.fontSizeSmall1x.fontSize }}>
             1 packet
           </Text>
-          <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", height: hp(4) }}>
             <View >
               {priceAmount && (
                 <Text style={[styles.productPrice, { color: colors.blackColor, marginTop: 10, paddingLeft: spacings.medium }]}>
                   {priceAmount} {currencyCode ? currencyCode : shopCurrency}
                 </Text>)}
             </View>
-            <View style={[{ alignItems: "baseline", justifyContent: "flex-end" }]}>
+            <View style={[{}]}>
               {loading ? (
-                <View style={styles.addToCartButton}>
+                <View style={[styles.addToCartButton, { padding: spacings.large }]}>
                   <ActivityIndicator size="small" color={redColor} />
                 </View>
               ) : (showQuantity && !outOfStock ? (
@@ -166,19 +165,18 @@ const ProductVertical = ({ product, onAddToCart, inventoryQuantity, loading, onP
               ) : (
                 !outOfStock && (
                   <Pressable
-                    style={styles.addToCartButton}
+                    style={{ position: "absolute", top: 3, right: -1 }}
                     onPress={handleAddToCart}>
                     <Image
                       source={ADD_TO_CART_IMG}
-                      style={{ height: 45, width: 45, resizeMode: "contain" }}
+                      style={{ height: hp(6), width: wp(10), resizeMode: "contain" }}
                     />
-                    {/* <Text style={styles.addToCartButtonText}>{ADD_TO_CART}</Text> */}
                   </Pressable>
                 )
               ))}
               {outOfStock && (
                 <View style={[styles.addToCartButton, { width: isDarkMode ? wp(21) : wp(22) }]}>
-                  <Text style={styles.addToCartButtonText}>{OUT_OF_STOCK}</Text>
+                  <Text style={[styles.addToCartButtonText, { marginTop: spacings.large }]}>{OUT_OF_STOCK}</Text>
                 </View>
               )}
 
@@ -215,7 +213,6 @@ const styles = StyleSheet.create({
     marginBottom: spacings.large
   },
   productName: {
-
     fontSize: style.fontSizeNormal1x.fontSize, fontWeight: style.fontWeightThin1x.fontWeight,
   },
   text: {
@@ -235,7 +232,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: wp(20),
-    backgroundColor: whiteColor,
+    // backgroundColor: whiteColor,
     // paddingHorizontal: 9,
     paddingVertical: 2,
     justifyContent: "center",

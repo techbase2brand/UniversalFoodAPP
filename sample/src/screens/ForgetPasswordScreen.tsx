@@ -13,9 +13,9 @@ import SuccessModal from '../components/Modal/SuccessModal';
 import { BACKGROUND_IMAGE } from '../assests/images';
 import { useThemes } from '../context/ThemeContext';
 import { lightColors, darkColors } from '../constants/Color';
-const { flex, alignItemsCenter, flexDirectionRow, alignJustifyCenter, positionAbsolute, borderRadius5, borderWidth1} = BaseStyle;
+const { flex, alignItemsCenter, flexDirectionRow, alignJustifyCenter, positionAbsolute, borderRadius5, borderWidth1 } = BaseStyle;
 
-const ForgetPasswordScreen = ({ navigation }: { navigation: any }) => {
+const ForgetPasswordScreen = ({ navigation}: { navigation: any }) => {
   const { isDarkMode } = useThemes();
   const colors = isDarkMode ? darkColors : lightColors;
   const [email, setEmail] = useState('');
@@ -75,7 +75,7 @@ const ForgetPasswordScreen = ({ navigation }: { navigation: any }) => {
     }
 
     try {
-      const response = await fetch('https://admin.appcartify.com:8444/api/forgotPassword', {
+      const response = await fetch('https://whale-app-nuspa.ondigitalocean.app/api/forgotPassword', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -109,7 +109,7 @@ const ForgetPasswordScreen = ({ navigation }: { navigation: any }) => {
       return;
     }
     try {
-      const response = await fetch('https://admin.appcartify.com:8444/api/resetPassword', {
+      const response = await fetch('https://whale-app-nuspa.ondigitalocean.app/api/resetPassword', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -118,7 +118,7 @@ const ForgetPasswordScreen = ({ navigation }: { navigation: any }) => {
       });
 
       if (response.ok) {
-        setSuccessModalVisible(true);
+      setSuccessModalVisible(true);
         logEvent('succesfuuly resetting password ');
       }
 
@@ -239,7 +239,7 @@ const ForgetPasswordScreen = ({ navigation }: { navigation: any }) => {
           onClose={() => setSuccessModalVisible(false)}
           headingText={"Password Changed!"}
           text={"You can now use your new password to login to your account."}
-          onPressContinue={() => { navigation.navigate('Login'), logEvent('Click continue button in success modal '); }}
+          onPressContinue={() => { navigation.goBack(), logEvent('Click continue button in success modal '); }}
         />}
       </ImageBackground>
     </KeyboardAvoidingView>

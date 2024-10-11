@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { SafeAreaView, ScrollView, View, StyleSheet, Text, Image, ActivityIndicator, Pressable, RefreshControl, TouchableOpacity, ImageBackground, FlatList, Alert, Animated, Modal } from 'react-native';
 import Icon from 'react-native-vector-icons/Entypo';
 import { useShopifyCheckoutSheet } from '@shopify/checkout-sheet-kit';
@@ -30,6 +30,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ChatButton from '../components/ChatButton';
 import PushNotification from 'react-native-push-notification';
 import LoginModal from '../components/Modal/LoginModal'
+import { AuthContext } from '../context/AuthProvider';
 
 const { flex, alignJustifyCenter, flexDirectionRow, resizeModeCover, positionAbsolute, justifyContentSpaceBetween, borderRadius10, alignItemsCenter, borderRadius5, textAlign, alignItemsFlexEnd, resizeModeContain } = BaseStyle;
 
@@ -51,7 +52,7 @@ function CartScreen({ navigation }: { navigation: any }): React.JSX.Element {
   const [shopCurrency, setShopCurrency] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const slideAnim = useRef(new Animated.Value(500)).current;  // Initial position off-screen
-
+  const { isLoggedIn } = useContext(AuthContext)
   const openModal = () => {
     setModalVisible(true);
     // Animate from bottom to top
@@ -373,7 +374,7 @@ function CartScreen({ navigation }: { navigation: any }): React.JSX.Element {
           navigation={navigation}
           text={"Cart"}
           textinput={true} />
-        <View style={{width:"100%",height:5,backgroundColor:whiteColor}}></View>
+        {!isDarkMode && <View style={{ width: "100%", height: 5, backgroundColor: whiteColor }}></View>}
         <View style={{ height: hp(80) }}>
           <ScrollView
             contentInsetAdjustmentBehavior="automatic"
@@ -499,87 +500,73 @@ function CartScreen({ navigation }: { navigation: any }): React.JSX.Element {
           </ScrollView>
           <ChatButton onPress={handleChatButtonPress} bottom={wp(1)} />
         </View>
-        {/* {totalQuantity > 0 && (
-          <View style={{position:"absolute", bottom:-70, borderWidth:1 ,borderBottomWidth:0, borderColor:"#797979", borderRadius:8, width:"100%", backgroundColor:"#f1efef"}}>
- <View style={styles.costContainer}>
-              <View style={[styles.costBlock, justifyContentSpaceBetween, flexDirectionRow]}>
-                <Text style={styles.costBlockText}>{SUBTOTAL}</Text>
-                <Text style={[styles.costBlockText, { color: themecolors.blackColor }]}>
-                  {getTotalAmount().totalAmount} {getTotalAmount().currencyCode}
-                </Text>
-              </View>
+        {isLoggedIn ?
+          totalQuantity > 0 && (
+            <View style={{ position: "absolute", bottom: -70, borderWidth: 1, borderBottomWidth: 0, borderColor: "#797979", borderRadius: 8, width: "100%", backgroundColor: "#f1efef" }}>
+              <View style={styles.costContainer}>
+                <View style={[styles.costBlock, justifyContentSpaceBetween, flexDirectionRow]}>
+                  <Text style={styles.costBlockText}>{SUBTOTAL}</Text>
+                  <Text style={[styles.costBlockText, { color: themecolors.blackColor }]}>
+                    {getTotalAmount().totalAmount} {getTotalAmount().currencyCode}
+                  </Text>
+                </View>
 
-              <View style={[styles.costBlock, justifyContentSpaceBetween, flexDirectionRow]}>
-                <Text style={styles.costBlockText}>{TAXES}</Text>
-                <Text style={[styles.costBlockText, { color: themecolors.blackColor }]}>
-                  {price(data?.cart?.cost?.totalTaxAmount)}
-                </Text>
-              </View>
+                <View style={[styles.costBlock, justifyContentSpaceBetween, flexDirectionRow]}>
+                  <Text style={styles.costBlockText}>{TAXES}</Text>
+                  <Text style={[styles.costBlockText, { color: themecolors.blackColor }]}>
+                    {price(data?.cart?.cost?.totalTaxAmount)}
+                  </Text>
+                </View>
 
-              <View style={[styles.costBlock, justifyContentSpaceBetween, flexDirectionRow, { borderTopColor: colors.border, borderTopWidth: 1, marginTop: spacings.large }]}>
-                <Text style={[styles.costBlockTextStrong, { color: themecolors.blackColor }]}>{TOTAL}</Text>
-                <Text style={[styles.costBlockTextStrong, { color: themecolors.blackColor }]}>
-                  {sum.toFixed(2)} {getTotalAmount().currencyCode}
-                </Text>
-              </View>
-              <Text style={{
-                fontSize: style.fontSizeNormal1x.fontSize,
-                marginVertical: spacings.Large2x,
-                fontWeight: style.fontWeightThin1x.fontWeight,
-                lineHeight: 20,
-                color: themecolors.blackColor,
-              }}>Note : Shipping will be calculated at checkout.</Text>
+                <View style={[styles.costBlock, justifyContentSpaceBetween, flexDirectionRow, { borderTopColor: colors.border, borderTopWidth: 1, marginTop: spacings.large }]}>
+                  <Text style={[styles.costBlockTextStrong, { color: themecolors.blackColor }]}>{TOTAL}</Text>
+                  <Text style={[styles.costBlockTextStrong, { color: themecolors.blackColor }]}>
+                    {sum.toFixed(2)} {getTotalAmount().currencyCode}
+                  </Text>
+                </View>
+                <Text style={{
+                  fontSize: style.fontSizeNormal1x.fontSize,
+                  marginVertical: spacings.Large2x,
+                  fontWeight: style.fontWeightThin1x.fontWeight,
+                  lineHeight: 20,
+                  color: themecolors.blackColor,
+                }}>Note : Shipping will be calculated at checkout.</Text>
 
+              </View>
+              <Pressable
+                style={[styles.cartButton, borderRadius10, alignJustifyCenter]}
+                disabled={totalQuantity === 0}
+                onPress={presentCheckout}>
+                <Text style={[styles.cartButtonText, textAlign]}>{CHECKOUT}</Text>
+              </Pressable>
             </View>
-          <Pressable
-            style={[styles.cartButton, borderRadius10, alignJustifyCenter]}
-            disabled={totalQuantity === 0}
-            onPress={presentCheckout}>
-            <Text style={[styles.cartButtonText, textAlign]}>{CHECKOUT}</Text>
-          </Pressable>
-          </View>
-        )} */}
-
-        <View style={[flexDirectionRow, positionAbsolute, justifyContentSpaceBetween, { alignItems: "baseline", bottom: -100, width: wp(100), zIndex: 1, backgroundColor: themecolors.whiteColor, height: hp(8) }]}>
-          <View style={{ width: wp(40) }}>
-            <View style={[styles.quantityContainer, alignJustifyCenter, { flexDirection: "column", width: wp(40) }]}>
-              <Text style={{ paddingHorizontal: spacings.large, color: themecolors.blackColor, fontSize: style.fontSizeMedium.fontSize, fontWeight: "700" }}>Total: £21.99</Text>
-              <Text style={{ backgroundColor: "#dafbd5", paddingHorizontal: 4, marginTop: 8, borderRadius: 5, color: "#018726" }}><AntDesign
-                name={"tag"}
-                size={15}
-                color={"#018726"}
-              />Saved £21.99 </Text>
+          )
+          :
+          <View style={[flexDirectionRow, positionAbsolute, justifyContentSpaceBetween, { alignItems: "baseline", bottom: -100, width: wp(100), zIndex: 1, backgroundColor: themecolors.whiteColor, height: hp(8) }]}>
+            <View style={{ width: wp(40) }}>
+              <View style={[styles.quantityContainer, alignJustifyCenter, { flexDirection: "column", width: wp(40), backgroundColor: themecolors.whiteColor }]}>
+                <Text style={{ paddingHorizontal: spacings.large, color: themecolors.blackColor, fontSize: style.fontSizeMedium.fontSize, fontWeight: "700" }}>Total: {getTotalAmount().currencyCode} {getTotalAmount().totalAmount} </Text>
+                <Text style={{ backgroundColor: "#dafbd5", paddingHorizontal: 4, marginTop: 8, borderRadius: 5, color: "#018726" }}><AntDesign
+                  name={"tag"}
+                  size={15}
+                  color={"#018726"}
+                />Saved £21.99 </Text>
+              </View>
             </View>
-          </View>
-          <View style={[{ position: "absolute", bottom: 10, right: 10, }]}>
+            <View style={[{ position: "absolute", bottom: 10, right: 10, }]}>
 
-            <Pressable
-              style={[styles.addToCartButton, borderRadius10, { backgroundColor: "#018726" }]}
-              onPress={openModal}
-            >
-              <Text style={[textAlign, { color: whiteColor, width: wp(12) }]}>
-                Login
-              </Text>
-            </Pressable>
-          </View>
-          {modalVisible && (
-            <LoginModal modalVisible={modalVisible} closeModal={closeModal} slideAnim={slideAnim} />
-            // <Modal
-            //   transparent={true}
-            //   visible={modalVisible}
-            //   animationType="none"
-            // >
-            //   <View style={styles.modalOverlay}>
-            //     <Animated.View style={[styles.modalContent, { transform: [{ translateY: slideAnim }] }]}>
-            //       <Text style={{}}>Login Form Here</Text>
-            //       <Pressable onPress={closeModal}>
-            //         <Text style={styles.closeButton}>Close</Text>
-            //       </Pressable>
-            //     </Animated.View>
-            //   </View>
-            // </Modal>
-          )}
-        </View>
+              <Pressable
+                style={[styles.addToCartButton, borderRadius10, { backgroundColor: "#018726" }]}
+                onPress={openModal}
+              >
+                <Text style={[textAlign, { color: whiteColor, width: wp(12) }]}>
+                  Login
+                </Text>
+              </Pressable>
+            </View>
+          </View>}
+        {modalVisible && (
+          <LoginModal modalVisible={modalVisible} closeModal={closeModal} slideAnim={slideAnim} />)}
       </SafeAreaView>
     </ImageBackground>
   );
@@ -641,18 +628,20 @@ function CartItem({
         ...(loading ? styles.productItemLoading : {}),
         borderWidth: 1, borderColor: "#797979", backgroundColor: isDarkMode ? grayColor : whiteColor
       }}>
-      <Image
-        resizeMethod="resize"
-        style={[styles.productImage, resizeModeCover, borderRadius5]}
-        alt={item?.merchandise?.image?.altText}
-        source={{ uri: item?.merchandise?.image?.url }}
-      />
+      <View style={{ borderWidth: 1, borderRadius: 10, overflow: "hidden", borderColor: grayColor }}>
+        <Image
+          resizeMethod="resize"
+          style={[styles.productImage, resizeModeCover, borderRadius5]}
+          alt={item?.merchandise?.image?.altText}
+          source={{ uri: item?.merchandise?.image?.url }}
+        />
+      </View>
       <View style={[styles.productText, flex, alignJustifyCenter, flexDirectionRow]}>
         <View style={[flex]}>
           <Text style={[styles.productTitle, { color: themecolors.blackColor }]}>
             {trimcateText(item?.merchandise?.product?.title)}
           </Text>
-          <Text style={[{ color: themecolors.blackColor }]}>
+          <Text style={[{ color: themecolors.grayColor }]}>
             2 x 16g
           </Text>
           <Text style={[styles.productPrice, { color: themecolors.blackColor }]}>
@@ -675,7 +664,7 @@ function CartItem({
           </Pressable> */}
 
 
-          <View style={[styles.quantityContainer, flexDirectionRow, { marginTop: 30 }]}>
+          <View style={[styles.quantityContainer, flexDirectionRow, { marginTop: 30, backgroundColor: "transparent" }]}>
             <TouchableOpacity onPress={decrementQuantity} >
               <AntDesign
                 name={"minuscircle"}
@@ -755,7 +744,7 @@ function createStyles(colors: Colors) {
     productTitle: {
       fontSize: style.fontSizeNormal1x.fontSize,
       // marginBottom: spacings.small2x,
-      fontWeight: style.fontWeightThin1x.fontWeight,
+      fontWeight: style.fontWeightThin.fontWeight,
       // lineHeight: 20,
       color: blackColor,
     },
@@ -765,7 +754,7 @@ function createStyles(colors: Colors) {
       padding: spacings.xLarge
     },
     productPrice: {
-      fontSize: style.fontSizeNormal.fontSize,
+      fontSize: style.fontSizeNormal1x.fontSize,
       fontWeight: style.fontWeightThin1x.fontWeight,
       color: blackColor,
     },

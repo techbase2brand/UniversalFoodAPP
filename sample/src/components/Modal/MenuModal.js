@@ -75,10 +75,10 @@ const MenuModal = ({ modalVisible, setModalVisible, onPressCart, onPressSearch, 
             <Text style={[styles.menuText, { color: colors.blackColor }]}>{"Saved"}</Text>
             <Feather name={"chevron-right"} size={25} color={colors.blackColor} />
           </Pressable>
-          <Pressable style={[styles.menuItem, justifyContentSpaceBetween, flexDirectionRow, alignItemsCenter]} onPress={onPressProfile}>
+          {/* <Pressable style={[styles.menuItem, justifyContentSpaceBetween, flexDirectionRow, alignItemsCenter]} onPress={onPressProfile}>
             <Text style={[styles.menuText, { color: colors.blackColor }]}>{"Profile"}</Text>
             <Feather name={"chevron-right"} size={25} color={colors.blackColor} />
-          </Pressable>
+          </Pressable> */}
           <Pressable style={[styles.menuItem, flexDirectionRow, justifyContentSpaceBetween, alignItemsCenter]}
             onPress={changeTheme}
           >

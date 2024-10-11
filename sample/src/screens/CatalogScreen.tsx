@@ -62,8 +62,8 @@ function CatalogScreen({ navigation }: Props) {
       setCollectionsFetched(true);
     };
     fetchInitialData()
-    const CollectionId = ("gid://shopify/Collection/331435278489");
-    const CollectionName = ("Speakers");
+    const CollectionId = ("gid://shopify/Collection/633133924694");
+    const CollectionName = ("Grocery");
     onPressCollection(CollectionId, CollectionName)
     setSelectedCollectionId(CollectionId)
 
@@ -237,6 +237,12 @@ function CatalogScreen({ navigation }: Props) {
     navigation.navigate("ShopifyInboxScreen")
   };
 
+  //move to catalog page
+  const onPressShopAll = () => {
+    logEvent('SeeAll Button Pressed from HomeScreenElectroncs');
+    navigation.navigate('CatalogStack')
+  }
+
   const onPressSeacrchBar = () => {
     logEvent("Click on Search Bar");
     navigation.navigate('Search',
@@ -249,30 +255,33 @@ function CatalogScreen({ navigation }: Props) {
         image={true}
         menuImage={true}
         notification={true}
+        onPressShopByCatagory={onPressShopAll}
       />
       <View style={[styles.container]}>
         <TouchableOpacity style={[styles.input, flexDirectionRow, alignItemsCenter, { backgroundColor: isDarkMode ? themecolors.grayColor : whiteColor, shadowColor: themecolors.grayColor }]} onPress={onPressSeacrchBar}>
+          <View style={[flex]}>
+            <Text style={{ color: isDarkMode ? whiteColor : themecolors.grayColor }}> {"Search here for anything you want..."}</Text>
+          </View>
           <Image
             source={WARLEY_SEARCH}
             style={{ width: wp(4), height: hp(5), resizeMode: 'contain', marginRight: 5 }}
           />
-          <View style={[flex]}>
-            <Text style={{ color: isDarkMode ? whiteColor : blackColor }}> Search...</Text>
-          </View>
         </TouchableOpacity>
         <View style={[styles.productCollectionBox]}>
-          {shopifyCollection.length != 0 ? <FlatList
-            data={shopifyCollection}
+          {collectionData?.collections?.edges ?
+          <FlatList
+            data={collectionData?.collections?.edges}
             renderItem={({ item }) => (
-              <Pressable onPress={() => onPressCollection(item?.id, item?.title)} style={{ padding: spacings.large, backgroundColor: selectedCollectionId === item?.id ? themecolors.lightPink : themecolors.whiteColor, borderWidth: 1, borderRadius: 10, marginHorizontal: 5, flexDirection: "row", borderColor: themecolors.grayColor }}>
-                <Image source={{ uri: item?.image?.url }} style={[resizeModeContain, { width: 25, height: 25 }]} />
-                <Text style={[styles.categoryName, textAlign, { color: themecolors.blackColor }]}>{item?.title}</Text>
+              <Pressable onPress={() => onPressCollection(item?.node?.id, item?.node?.title)} style={{ alignItems: "center", justifyContent: "center", paddingHorizontal: 10, backgroundColor: selectedCollectionId === item?.node?.id ? themecolors.lightPink : themecolors.whiteColor, borderWidth: 1, borderRadius: 10, marginHorizontal: 5, flexDirection: "row", borderColor: themecolors.grayColor }}>
+                <Image source={{ uri: item?.node.image?.url }} style={[resizeModeContain, { width: 25, height: 25 }]} />
+                <Text style={[styles.categoryName, textAlign, { color: themecolors.blackColor }]}>{item?.node?.title}</Text>
               </Pressable>
             )}
             showsHorizontalScrollIndicator={false}
             keyExtractor={(index) => index.toString()}
             horizontal
-          /> :
+          />
+          :
             <SkeletonPlaceholder>
               <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
                 <View style={{ width: wp(30), height: hp(5), borderRadius: 10, marginHorizontal: 5 }} />
@@ -293,20 +302,20 @@ function CatalogScreen({ navigation }: Props) {
                     product={item}
                     onAddToCart={addToCartProduct}
                     loading={addingToCart?.has(getVariant(item)?.id ?? '')}
-                    inventoryQuantity={inventoryQuantities[index]}
-                    option={options[index]}
-                    ids={productVariantsIDS[index]}
-                    width={wp(47)}
+                    // inventoryQuantity={inventoryQuantities[index]}
+                    // option={options[index]}
+                    // ids={productVariantsIDS[index]}
+                    width={wp(46)}
                     height={wp(51)}
                     spaceTop={4}
                     onPress={() => {
                       navigation.navigate('ProductDetails', {
                         product: item,
                         variant: getVariant(item),
-                        inventoryQuantity: inventoryQuantities[index],
+                        // inventoryQuantity: inventoryQuantities[index],
                         tags: tags[index],
-                        option: options[index],
-                        ids: productVariantsIDS[index]
+                        // option: options[index],
+                        // ids: productVariantsIDS[index]
                       });
                     }}
                   />

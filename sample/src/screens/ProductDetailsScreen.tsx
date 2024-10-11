@@ -91,7 +91,7 @@ function ProductDetailsScreen({ navigation, route }: Props) {
       }
     };
 
-    if (tags.length > 0) {
+    if (tags?.length > 0) {
       fetchRelatedProducts();
     } else {
       // Clear related products when tags are empty
@@ -148,8 +148,8 @@ function ProductDetailsScreen({ navigation, route }: Props) {
   const generateLink = async (id: string) => {
     try {
       const link = await dynamicLinks().buildShortLink({
-        link: `https://warley.page.link/XktS?productId=${id}`,
-        domainUriPrefix: 'https://warley.page.link',
+        link: `https://universalfood.page.link/XktS?productId=${id}`,
+        domainUriPrefix: 'https://universalfood.page.link',
         android: {
           packageName: 'com.UniversalFood',
         },
@@ -162,6 +162,7 @@ function ProductDetailsScreen({ navigation, route }: Props) {
   }
 
   const shareProduct = async (id: string) => {
+    console.log(id)
     setShareProductLoading(true)
     logEvent('Share Product Button Clicked');
     const getLink = await generateLink(id)
@@ -186,7 +187,7 @@ function ProductDetailsScreen({ navigation, route }: Props) {
       console.log('Error => ', error);
     }
   };
-  console.log("route?.params?.product.title", route?.params?.product.id);
+  // console.log("route?.params?.product.title", route?.params?.product.id);
 
   return (
     <ImageBackground style={[styles.container, { backgroundColor: themecolors.whiteColor }]} source={isDarkMode ? '' : BACKGROUND_IMAGE}>
@@ -697,12 +698,15 @@ function ProductDetails({
                   <Text style={[styles.productDescription, { color: themecolors.blackColor }]}>  <Text style={[styles.productDescription, textDecorationUnderline, { fontWeight: style.fontWeightMedium1x.fontWeight, color: themecolors.blackColor }]}>4.0/5</Text> (45 reviews)</Text> */}
                 </Pressable>
               </View>
-              <Text style={[styles.productPrice, { color: themecolors.blackColor }]}>About this product</Text>
 
-              {product.description && <Pressable onPress={toggleExpanded} style={{ marginVertical: spacings.large }}>
-                <Text style={[styles.productDescription, { color: "#808080" }]} numberOfLines={expanded ? null : 2}
-                  ellipsizeMode="tail">{product.description}</Text>
-              </Pressable>}
+
+              {product.description && <>
+                <Text style={[styles.productPrice, { color: themecolors.blackColor }]}>About this product</Text>
+                <Pressable onPress={toggleExpanded} style={{ marginVertical: spacings.large }}>
+                  <Text style={[styles.productDescription, { color: "#808080" }]} numberOfLines={expanded ? null : 2}
+                    ellipsizeMode="tail">{product.description}</Text>
+                </Pressable>
+              </>}
             </View>
             <View style={{ marginBottom: spacings.large }}>
               <View>
@@ -712,7 +716,7 @@ function ProductDetails({
                   }
                   return (
                     <View key={index} style={styles.optionContainer}>
-                      {/* <Text style={[styles.relatedProductsTitle, { color: themecolors.blackColor }]}>Choose {option?.name}</Text>
+                      <Text style={[styles.relatedProductsTitle, { color: themecolors.blackColor }]}>Choose {option?.name}</Text>
                       <View style={[flexDirectionRow, { marginTop: spacings.large }]}>
                         <ScrollView horizontal>
                           {option?.values.map((value, idx) => (
@@ -735,7 +739,7 @@ function ProductDetails({
                             </TouchableOpacity>
                           ))}
                         </ScrollView>
-                      </View> */}
+                      </View>
                     </View>
                   );
                 })}
@@ -817,7 +821,7 @@ function ProductDetails({
               </View>
             </View>
           </View>
-          {/* {relatedProducts?.length != 0 && <View style={styles.relatedProductsContainer}>
+          {relatedProducts?.length != 0 && <View style={styles.relatedProductsContainer}>
             <Text style={[styles.relatedProductsTitle, { color: themecolors.blackColor }]}>{YOU_MIGHT_LIKE}</Text>
             <FlatList
               data={relatedProducts}
@@ -873,13 +877,11 @@ function ProductDetails({
               keyExtractor={(index) => index?.toString()}
               showsHorizontalScrollIndicator={false}
             />
-          </View>} */}
+          </View>}
 
           {/* our product */}
-          <View style={[{ width: "100%", marginVertical: 10 }, alignItemsCenter, justifyContentSpaceBetween, flexDirectionRow]}>
+          {/* <View style={[{ width: "100%", marginVertical: 10 }, alignItemsCenter, justifyContentSpaceBetween, flexDirectionRow]}>
             <Text style={[styles.text, { color: blackColor }]}>{"Similar Products"}</Text>
-            {/* <Text style={{ color: "#717171", fontSize: style.fontSizeNormal.fontSize, fontWeight: style.fontWeightThin1x.fontWeight }} onPress={() => onPressCollection(ELECTRONIC_OUR_PRODUCT_COLLECTION_ID, OUR_PRODUCT)}>See All <AntDesign name={"arrowright"} size={16} color={"#717171"} /></Text> */}
-
           </View>
           <View style={[{ height: hp(30) }, alignJustifyCenter]}>
             {products?.length > 0 ? <FlatList
@@ -916,22 +918,22 @@ function ProductDetails({
                 color={blackColor}
               />
             }
-          </View>
+          </View> */}
           {shareProductloading && <LoadingModal visible={shareProductloading} />}
         </View>
       </ScrollView>
       <ChatButton onPress={handleChatButtonPress} bottom={100} />
-      <View style={[flexDirectionRow, positionAbsolute, justifyContentSpaceBetween, { alignItems: "baseline", bottom: 3, width: wp(100), zIndex: 1, backgroundColor: themecolors.whiteColor, height: hp(10) }]}>
-        <View style={{ width: wp(40) }}>
-          <View style={[styles.quantityContainer, alignJustifyCenter, { width: wp(50) }]}>
+      <View style={[flexDirectionRow, positionAbsolute, justifyContentSpaceBetween, { alignItems: "baseline", bottom: 13, width: wp(100), zIndex: 1, backgroundColor: themecolors.whiteColor, height: hp(10) }]}>
+        {getInventoryQuantity() != 0 && <View style={{ width: wp(40) }}>
+          <View style={[styles.quantityContainer, alignJustifyCenter, { width: wp(40) }]}>
             <Text style={{ padding: spacings.large, color: themecolors.blackColor, fontSize: style.fontSizeMedium.fontSize, fontWeight: "600" }}>Total: {(variant?.price?.amount) ? (variant?.price?.amount) : (variant?.price)} {(variant?.price?.currencyCode) ? (variant?.price?.currencyCode) : shopCurrency}</Text>
             <Text style={{ backgroundColor: "#dafbd5", paddingHorizontal: 4, borderRadius: 5, color: "#018726" }}><AntDesign
               name={"tag"}
-              size={15}
+              size={13}
               color={"#018726"}
-            />Saved £21.99 </Text>
+            /> Saved £21.99 </Text>
           </View>
-        </View>
+        </View>}
         <View style={[styles.addToCartButtonContainer, { position: "absolute", bottom: 15, right: 10, }]}>
           {getInventoryQuantity() <= 0 ? (
             <Pressable style={[styles.outOfStockButton, borderRadius10]}>
@@ -989,7 +991,7 @@ function createStyles(colors: Colors) {
       color: colors.textSubdued,
     },
     productTitle: {
-      fontSize: style.fontSizeLarge.fontSize,
+      fontSize: style.fontSizeLargeXX.fontSize,
       fontWeight: style.fontWeightThin1x.fontWeight,
       marginTop: spacings.large,
       marginBottom: spacings.normal,
@@ -1007,7 +1009,7 @@ function createStyles(colors: Colors) {
       color: colors.text,
     },
     productPrice: {
-      fontSize: style.fontSizeLarge.fontSize,
+      fontSize: style.fontSizeMedium1x.fontSize,
       color: blackColor,
       fontWeight: style.fontWeightThin1x.fontWeight,
 

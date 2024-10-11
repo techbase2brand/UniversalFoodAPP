@@ -3,11 +3,14 @@ import React, { useState } from 'react'
 import AntDesign from 'react-native-vector-icons/dist/AntDesign';
 import LoginScreen from '../../screens/LoginScreen'
 import RegisterScreen from '../../screens/RegisterScreen'
-import { whiteColor } from '../../constants/Color'
+import { darkColors, lightColors, whiteColor } from '../../constants/Color'
 import { BACKGROUND_IMAGE, WARLEY_HEADER_LOGO_NEW } from '../../assests/images'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from '.././../utils';
+import { useThemes } from '../../context/ThemeContext';
 
 const LoginModal = ({ modalVisible, closeModal, slideAnim }) => {
+  const { isDarkMode, toggleTheme } = useThemes();
+  const colors = isDarkMode ? darkColors : lightColors;
   const [showSignUp, setShowSignUp] = useState(false);  // State to toggle between login and signup
 
   // Function to switch to SignUpScreen
@@ -27,16 +30,16 @@ const LoginModal = ({ modalVisible, closeModal, slideAnim }) => {
       animationType="none"
     >
       <View style={styles.modalOverlay}>
-        <Animated.View style={[styles.modalContent, { transform: [{ translateY: slideAnim }] }]}>
-          <ImageBackground style={{ flex: 1 }} source={BACKGROUND_IMAGE}>
+        <Animated.View style={[styles.modalContent, { transform: [{ translateY: slideAnim }], backgroundColor: colors.whiteColor }]}>
+          <ImageBackground style={{ flex: 1 }} source={isDarkMode ? "" : BACKGROUND_IMAGE}>
             <Pressable onPress={closeModal} style={{ paddingHorizontal: 15, paddingTop: 10 }}>
-              <AntDesign name={"close"} size={30} color={"black"} />
+              <AntDesign name={"close"} size={30} color={colors.blackColor} />
             </Pressable>
-            <Image source={WARLEY_HEADER_LOGO_NEW} style={{marginBottom:10, width: wp(40), height: hp(6.5), resizeMode: "contain", alignSelf: "center" }} />
+            <Image source={WARLEY_HEADER_LOGO_NEW} style={{ marginBottom: 10, width: wp(40), height: hp(6.5), resizeMode: "contain", alignSelf: "center" }} />
             {showSignUp ? (
-              <RegisterScreen onBackToLogin={handleBackToLogin} setShowSignUp={setShowSignUp} />
+              <RegisterScreen onBackToLogin={handleBackToLogin} setShowSignUp={setShowSignUp} onCloseModal={closeModal}/>
             ) : (
-              <LoginScreen handleSignUpClick={handleSignUpClick} />
+              <LoginScreen handleSignUpClick={handleSignUpClick} onBackToLogin={handleBackToLogin} onCloseModal={closeModal}/>
             )}
           </ImageBackground>
         </Animated.View>
@@ -51,7 +54,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end', // Align modal at the bottom
   },
   modalContent: {
-    backgroundColor: whiteColor,
     height: '100%',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,

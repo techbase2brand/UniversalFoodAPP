@@ -31,7 +31,7 @@ import { useNavigation } from '@react-navigation/native';
 const { flex, alignJustifyCenter, alignItemsCenter, borderWidth1, borderRadius5, textDecorationUnderline, resizeModeContain, flexDirectionRow,
   positionAbsolute, textAlign, justifyContentSpaceBetween } = BaseStyle;
 
-const LoginScreen = ({ handleSignUpClick }) => {
+const LoginScreen = ({ handleSignUpClick, onCloseModal }) => {
   const navigation = useNavigation();
   const { setIsLoggedIn } = useContext(AuthContext)
   const { isDarkMode } = useThemes();
@@ -86,20 +86,25 @@ const LoginScreen = ({ handleSignUpClick }) => {
       return;
     }
     try {
-      const response = await fetch(`https://admin.appcartify.com:8444/api/customerLogin`, {
+      const response = await fetch(`https://whale-app-nuspa.ondigitalocean.app/api/customerLogin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
       });
+      // console.log(email, password)
+      setLoading(true)
       dispatch(loginRequest({ email, password }));
       if (response.ok) {
         await checkIfUserIsRegistered(email)
         await AsyncStorage.setItem('isUserLoggedIn', response.url)
         setIsLoggedIn(true)
-        navigation.navigate("Home");
+        navigation.navigate("Cart");
+        onCloseModal()
+        // handleSignUpClick()
         dispatch(loginSuccess({ email, password }));
+        setLoading(false)
         logEvent('LoginSuccess');
       } else {
         const responseData = await response.json();
@@ -237,7 +242,7 @@ const LoginScreen = ({ handleSignUpClick }) => {
         <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{EMAIL}</Text>
         <View style={[styles.input, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: emailError ? redColor : grayColor }]}>
           <View style={{ width: "8.5%" }}>
-            <Fontisto name={"email"} size={24} color={emailError ? redColor : blackColor} />
+            <Fontisto name={"email"} size={24} color={emailError ? redColor : colors.grayColor} />
           </View>
           <View style={{ flex: 1 }}>
             <TextInput
@@ -260,7 +265,7 @@ const LoginScreen = ({ handleSignUpClick }) => {
         <Text style={[styles.textInputHeading, { color: colors.blackColor }]}>{PASSWORD}</Text>
         <View style={[styles.input, borderRadius5, borderWidth1, flexDirectionRow, alignItemsCenter, { borderColor: passwordError ? redColor : grayColor }]}>
           <View style={{ width: "8%" }}>
-            <MaterialCommunityIcons name={"lock"} size={24} color={passwordError ? redColor : blackColor} />
+            <MaterialCommunityIcons name={"lock"} size={24} color={passwordError ? redColor : colors.grayColor} />
           </View>
           <View style={{ flex: 1 }}>
             <TextInput

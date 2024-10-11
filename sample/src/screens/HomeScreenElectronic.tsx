@@ -91,7 +91,7 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
       myHeaders.append("X-Shopify-Access-Token", ADMINAPI_ACCESS_TOKEN);
       const graphql = JSON.stringify({
         query: `query MyQuery {
-      collection(id: "gid://shopify/Collection/331435016345") {
+      collection(id: "gid://shopify/Collection/633133924694") {
         products(first: 10) {
           nodes {
             id
@@ -169,7 +169,7 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
       myHeaders.append("X-Shopify-Access-Token", ADMINAPI_ACCESS_TOKEN);
       const graphql = JSON.stringify({
         query: `query MyQuery {
-        collection(id: "gid://shopify/Collection/331437375641") {
+        collection(id: "gid://shopify/Collection/633133957462") {
           products(first: 4) {
             nodes {
               id
@@ -488,7 +488,7 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
             onPress={onPressSeacrchBar}
           >
             <View style={[flex]}>
-              <Text style={{ color: isDarkMode ? whiteColor : blackColor }}> {SEARCH}</Text>
+              <Text style={{ color: isDarkMode ? whiteColor : colors.grayColor }}> {"Search here for anything you want..."}</Text>
             </View>
             <Image
               source={WARLEY_SEARCH}
@@ -515,41 +515,8 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
               <Text style={{ color: "#717171", fontSize: style.fontSizeNormal.fontSize, fontWeight: style.fontWeightThin1x.fontWeight }} >{SHOW_ALL}</Text>
             </Pressable>
           </View>
-          {/* <View style={[{ width: wp(100), height: "auto", marginTop: 5, paddingHorizontal: spacings.large }, flexDirectionRow]}>
-            <FlatList
-              data={catagory}
-              renderItem={({ item, index }) => {
-                const borderColor = borderColors[index % borderColors.length];
-                return (
-                  <View style={[{ width: wp(24), height: hp(14) },]}>
-                    <Pressable
-                      style={[styles.categoryCard, overflowHidden, alignJustifyCenter, { backgroundColor: whiteColor, borderColor: isDarkMode ? whiteColor : borderColor, borderWidth: isDarkMode ? 1 : 1 }]}
-                      onPress={() =>
-                        item.id === 'more'
-                          ? onPressShopAll()
-                          : onPressCollection(item?.id, item?.title)
-                      }
-                    >
-                      <Image
-                        source={
-                          { uri: item.image.url }
-                        }
-                        style={
-                          [styles.categoryImage, { resizeMode: "contain" }]
-                        }
-                      />
-                    </Pressable>
-
-                  </View>
-                );
-              }}
-              showsHorizontalScrollIndicator={false}
-              horizontal
-              keyExtractor={(item) => item?.id}
-            />
-          </View> */}
           <View style={[{ width: wp(100), height: "auto", marginTop: 5, paddingHorizontal: spacings.large }, flexDirectionRow]}>
-            {catagory.length === 0 ? (
+            {!collectionData?.collections?.edges ? (
               <SkeletonPlaceholder>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   <View style={{ width: wp(24), height: hp(14), borderRadius: 10, marginRight: 10 }} />
@@ -560,11 +527,11 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
               </SkeletonPlaceholder>
             ) : (
               <FlatList
-                data={catagory}
+                data={collectionData?.collections?.edges.slice(0, 6)}
                 renderItem={({ item, index }) => {
                   const borderColor = borderColors[index % borderColors.length];
                   return (
-                    <View style={[{ width: wp(24), height: hp(14) }]}>
+                    <View style={[{ width: wp(23), height: hp(14) }]}>
                       <Pressable
                         style={[
                           styles.categoryCard,
@@ -579,11 +546,11 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
                         onPress={() =>
                           item.id === 'more'
                             ? onPressShopAll()
-                            : onPressCollection(item?.id, item?.title)
+                            : onPressCollection(item?.node?.id, item?.node?.title)
                         }
                       >
                         <Image
-                          source={{ uri: item.image.url }}
+                          source={{ uri: item?.node?.image?.url }}
                           style={[styles.categoryImage, { resizeMode: "contain" }]}
                         />
                       </Pressable>
@@ -598,14 +565,14 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
           </View>
 
           {/* catagories */}
-          <View style={[{ width: "100%", marginVertical: 10 }, alignItemsCenter, justifyContentSpaceBetween, flexDirectionRow]}>
+          <View style={[{ width: "100%", marginBottom: 10 }, alignItemsCenter, justifyContentSpaceBetween, flexDirectionRow]}>
             <Text style={[styles.text, { color: colors.blackColor }]}>{CATEGORIES}</Text>
             <Pressable onPress={onPressShopAll}>
               <Text style={{ color: "#717171", fontSize: style.fontSizeNormal.fontSize, fontWeight: style.fontWeightThin1x.fontWeight }} >{SHOW_ALL} </Text>
             </Pressable>
           </View>
           {
-            catagory.length === 0 ? (
+            !collectionData?.collections?.edges ? (
               <SkeletonPlaceholder>
                 <View>
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -625,11 +592,12 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
             ) : (
               <View style={[{ width: wp(100), height: "auto", marginTop: 5 }, flexDirectionRow]}>
                 <FlatList
-                  data={shopifyCollection.slice(0, 8)}
+                  data={collectionData?.collections?.edges.slice(0, 8)}
                   renderItem={({ item, index }) => {
+                    // console.log(item?.node?.id)
                     const borderColor = borderColors[index % borderColors.length];
                     return (
-                      <View style={[{ width: wp(24.5), height: hp(18) }, alignItemsCenter]}>
+                      <View style={[{ width: wp(24.5), height: hp(15) }, alignItemsCenter]}>
                         <Pressable
                           style={[
                             styles.card,
@@ -640,10 +608,10 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
                               borderColor: isDarkMode ? borderColor : borderColor,
                             },
                           ]}
-                          onPress={() => onPressCollection(item?.id, item?.title)}
+                          onPress={() => onPressCollection(item?.node?.id, item?.node?.title)}
                         >
                           <Image
-                            source={{ uri: item?.image?.url }}
+                            source={{ uri: item?.node?.image?.url }}
                             style={[styles.categoryImage, { resizeMode: "contain" }]}
                           />
                         </Pressable>
@@ -652,7 +620,7 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
                             styles.categoryName,
                             textAlign,
                             {
-                              lineHeight: lineHeights[item?.title] || 10,
+                              lineHeight: lineHeights[item?.node?.title] || 10,
                               color: blackColor,
                               paddingVertical: spacings.large,
                               fontWeight: style.fontWeightBold.fontWeight,
@@ -660,15 +628,15 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
                               color: colors.blackColor,
                             },
                           ]}
-                          onTextLayout={handleTextLayout(item?.title)}
+                          onTextLayout={handleTextLayout(item?.node?.title)}
                         >
-                          {item?.title}
+                          {item?.node?.title}
                         </Text>
                       </View>
                     );
                   }}
                   numColumns={4}
-                  keyExtractor={(item) => item?.id}
+                  keyExtractor={(item) => item?.node?.id}
                 />
               </View>
             )
@@ -676,8 +644,8 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
 
 
           {/* BestSelling */}
-          <Text style={[styles.text, { color: colors.blackColor, marginVertical: 15 }]}>{BEST_SELLING}</Text>
-          <View style={[{ height: hp(30) }, alignJustifyCenter]}>
+          <Text style={[styles.text, { color: colors.blackColor, marginBottom: 15 }]}>{BEST_SELLING}</Text>
+          <View style={[{ height: hp(26) }, alignJustifyCenter]}>
             {bestDealProducts?.length > 0 ? <FlatList
               data={bestDealProducts}
               renderItem={({ item, index }) => {
@@ -686,7 +654,7 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
                     product={item}
                     onAddToCart={addToCartProduct}
                     loading={addingToCart?.has(getVariant(item)?.id ?? '')}
-                    inventoryQuantity={bestDealInventoryQuantities[index]}
+                    // inventoryQuantity={bestDealInventoryQuantities[index]}
                     option={bestDealoptions[index]}
                     ids={bestDealProductVariantsIDS[index]}
                     spaceTop={4}
@@ -694,7 +662,7 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
                       navigation.navigate('ProductDetails', {
                         product: item,
                         variant: getVariant(item),
-                        inventoryQuantity: bestDealInventoryQuantities[index],
+                        // inventoryQuantity: bestDealInventoryQuantities[index],
                         tags: bestDealTags[index],
                         option: bestDealoptions[index],
                         ids: bestDealProductVariantsIDS[index]
@@ -809,7 +777,7 @@ const HomeScreenElectronic = ({ navigation }: { navigation: any }) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: spacings.medium
+    paddingHorizontal: spacings.large
   },
   text: {
     fontSize: style.fontSizeMedium.fontSize,
@@ -818,14 +786,14 @@ const styles = StyleSheet.create({
     // fontFamily: 'GeneralSans-Variable'
   },
   input: {
-    width: "93.5%",
+    width: "95.5%",
     height: hp(6),
     borderColor: 'transparent',
     borderWidth: .1,
     borderRadius: 5,
     paddingHorizontal: spacings.large,
-    marginVertical: spacings.small,
-    marginHorizontal: 16,
+    // marginVertical: spacings.small,
+    marginHorizontal: 10,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -850,8 +818,8 @@ const styles = StyleSheet.create({
     paddingVertical: spacings.small,
   },
   categoryImage: {
-    width: "100%",
-    height: "100%",
+    width: "110%",
+    height: "110%",
     // borderRadius: 10,
   },
   categoryName: {
